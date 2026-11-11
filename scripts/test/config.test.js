@@ -5,11 +5,14 @@ import { test } from 'node:test';
 import { agentRules, isAccountId, resolveConfig, validateConfig } from '../lib/config.js';
 import { ROOT, readRawConfig } from '../lib/node.js';
 
-const template = () => readRawConfig();
+// The template as shipped (before Adesope set the owner), built from the real config.
+const template = () => ({ ...readRawConfig(), ownerAccountId: '<set by Adesope>' });
 const withOwner = (owner = 'ade.testnet') => ({ ...template(), ownerAccountId: owner });
 
-test('the committed config/seed.json is a valid template', () => {
+test('the committed config/seed.json is valid', () => {
   assert.deepEqual(validateConfig(template(), 'template'), []);
+  const raw = readRawConfig();
+  if (!raw.ownerAccountId.includes('<')) assert.deepEqual(validateConfig(raw, 'owner'), []);
 });
 
 test('owner stage needs ownerAccountId', () => {

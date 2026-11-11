@@ -1,6 +1,6 @@
 {
   "network": "testnet",
-  "ownerAccountId": "<set by Adesope>",
+  "ownerAccountId": "agentgate-ayo.testnet",
   "vaultAccountId": "vault.<owner>.testnet",
   "recipients": {
     "apiProvider": "api-provider.<owner>.testnet",
