@@ -81,7 +81,7 @@ function LedgerCard() {
           </ChainView>
         </div>
       </div>
-      <div className="ag-card-head flex-wrap" style={{ borderTop: '1px solid var(--ag-line)', borderBottom: 0 }}>
+      <div className="ag-card-foot">
         <span className="small text-secondary d-inline-flex align-items-center gap-2">
           <Icon name="key" size={14} />
           Agent key {shortKey(cfg.demoKeys.apiBuyerPublicKey)} can only call <code>request_spend</code>
@@ -110,14 +110,14 @@ export default function Overview() {
             <h1>
               The AI can be fooled.
               <br />
-              The money can’t.
+              <span className="ag-hero-em">The money can’t.</span>
             </h1>
             <p className="ag-hero-sub">
               AgentGate is a NEAR vault for AI agents. The agent’s key can only <em className="fst-normal text-body">ask</em> the vault to pay,
               and the contract decides what money moves.
             </p>
             <div className="d-flex flex-wrap gap-3">
-              <Link to="/judge" className="btn btn-primary btn-lg d-inline-flex align-items-center gap-2">
+              <Link to="/judge" className="btn btn-primary btn-lg btn-icon-end d-inline-flex align-items-center gap-2">
                 Try to break it
                 <Icon name="arrowRight" />
               </Link>
@@ -137,13 +137,13 @@ export default function Overview() {
         <p className="ag-section-sub">In both cases the agent’s key was the money’s key, so whoever steered the agent’s words also moved the money.</p>
         <div className="row g-3">
           <div className="col-12 col-md-6">
-            <div className="ag-panel ag-panel-pad h-100">
+            <div className="ag-panel ag-panel-pad h-100 ag-incident">
               <div className="ag-label mb-2 font-monospace">Freysa · Nov 2024</div>
               <p className="mb-0">After 482 tries, one message talked an AI agent into sending its whole prize pool.</p>
             </div>
           </div>
           <div className="col-12 col-md-6">
-            <div className="ag-panel ag-panel-pad h-100">
+            <div className="ag-panel ag-panel-pad h-100 ag-incident">
               <div className="ag-label mb-2 font-monospace">AIXBT · Mar 2025</div>
               <p className="mb-0">An attacker queued two prompts on its dashboard and the agent sent 55.5 ETH.</p>
             </div>
@@ -154,12 +154,14 @@ export default function Overview() {
       <section className="ag-section">
         <h2 className="ag-section-title">How it works</h2>
         <p className="ag-section-sub">Three of these rules live in the vault contract. The last one is enforced by the NEAR protocol itself.</p>
-        <div className="row g-4">
+        <div className="row g-3">
           {STEPS.map(([title, text], i) => (
             <div className="col-12 col-sm-6 col-lg-3" key={title}>
-              <div className="ag-step-num mb-2">{String(i + 1).padStart(2, '0')}</div>
-              <div className="fw-medium mb-1">{title}</div>
-              <p className="small text-secondary mb-0">{text}</p>
+              <div className="ag-panel ag-panel-pad ag-step">
+                <div className="ag-step-num mb-3">{i + 1}</div>
+                <div className="fw-semibold mb-1">{title}</div>
+                <p className="small text-secondary mb-0">{text}</p>
+              </div>
             </div>
           ))}
         </div>

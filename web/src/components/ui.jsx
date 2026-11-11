@@ -65,10 +65,10 @@ export function Ext({ href, children, className = '' }) {
 export function Mark({ size = 20 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 20 20" aria-hidden="true">
-      <rect x="1" y="1" width="18" height="18" rx="5" fill="var(--ag-text)" />
-      <rect x="5.5" y="5" width="2" height="10" rx="1" fill="var(--ag-bg)" />
-      <rect x="12.5" y="5" width="2" height="10" rx="1" fill="var(--ag-bg)" />
-      <rect x="5.5" y="9" width="9" height="2" rx="1" fill="var(--ag-bg)" />
+      <rect x="1" y="1" width="18" height="18" rx="5" fill="var(--ag-accent)" />
+      <rect x="5.5" y="5" width="2" height="10" rx="1" fill="#fff" />
+      <rect x="12.5" y="5" width="2" height="10" rx="1" fill="#fff" />
+      <rect x="5.5" y="9" width="9" height="2" rx="1" fill="#fff" />
     </svg>
   );
 }
@@ -85,7 +85,7 @@ export function Loading({ what = 'Reading from NEAR testnet' }) {
 /** Error state for a failed chain read. Shows the raw message; never falls back to fake numbers. */
 export function ErrorBox({ error, onRetry }) {
   return (
-    <div className="ag-panel ag-panel-pad" role="alert" style={{ borderColor: 'color-mix(in srgb, var(--ag-blocked) 40%, transparent)' }}>
+    <div className="ag-panel ag-panel-pad ag-incident" role="alert">
       <div className="fw-medium mb-1">Could not read from NEAR testnet</div>
       <pre className="small text-secondary mb-3 text-wrap font-monospace">{String(error?.message || error)}</pre>
       {onRetry && (

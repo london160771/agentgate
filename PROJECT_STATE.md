@@ -39,6 +39,12 @@ P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
 
 ## Log
 
+### Design pass v2, branch `design-unslop` (2026-11-11, Adesope: dark look "bland", use jakubkrehel + shadcn-ui, sticky navbar)
+**Light theme** with shadcn/ui's component language (neutral zinc surfaces on a warm off-white page, layered ring shadows instead of borders, 8/10/14px radii, Card / Badge / Button / Table styles) rebuilt in plain CSS on Bootstrap 5, because CLAUDE.md forbids Tailwind and shadcn components require it. Geist + Geist Mono (Google Fonts link). One cobalt accent (#2f5bea) for the primary action, links, the gauge and NEAR's own refusals.
+**jakubkrehel rules applied**: semantic color tokens over primitives; one filled action per view; contrast measured (muted text 4.8:1 on white / 4.9:1 on page, white on cobalt 5.5:1, every verdict stamp ≥ 4.5:1); press scale 0.96 on enabled buttons; named transitions with `cubic-bezier(0.2, 0, 0, 1)`; hover styles only under `@media (hover: hover)`; entrances gated by `prefers-reduced-motion` with an opacity fallback; 2px less padding on the icon side of the hero button.
+**Sticky navbar**: `position: sticky` with a translucent white background and blur; on phones the links become one horizontal scrolling row (nav height 88px).
+**Checks**: `npm run build` OK · `vitest` 30/30 · headless Chromium 1440px and iPhone 13: all 4 pages render live data, nav stays at top after scrolling (top = 0), no horizontal page overflow, no page errors.
+
 ### Design pass (unslop), branch `design-unslop` (2026-11-11, Adesope asked: "the web design is poor")
 **Direction**: a security vault at night. Ink-tinted dark neutral ramp, IBM Plex Sans + IBM Plex Mono (Google Fonts link, no npm dependency), one cobalt accent for NEAR's own refusals, links and focus; semantic colours only for verdicts. Signature: one "verdict stamp" style (mono code, status dot, hairline) for every decision on every page. Moment: the home page "Vault right now" ledger card with the live balance, counts, the 4 latest real decisions and the agent key's permission.
 **Changed**: `web/index.html` (dark mode, fonts), new `web/src/theme.css` (Bootstrap 5 variables + a few `ag-*` classes; no Tailwind), `components/{ui,Layout,Wallet}.jsx` (line icons as inline SVG, flat gate mark, quiet REAL/TESTNET strip, stamps, gauge), `pages/{Overview,Agents,Activity,Judge}.jsx` (split hero with the ledger card, ledger tables, judge path + gauge + Run all panel). Same routes, features, data and chain calls.

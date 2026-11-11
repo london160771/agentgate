@@ -111,9 +111,9 @@ function PaymentLog({ log }) {
                         <td>
                           <StatusChip status={p.code} />
                         </td>
-                        <td className="text-secondary">{p.agent_name}</td>
+                        <td className="text-secondary text-nowrap">{p.agent_name}</td>
                         <td>
-                          <Mono className="small">{p.to}</Mono>
+                          <span className="font-monospace small text-nowrap">{p.to}</span>
                         </td>
                         <td className="num">{formatNear(p.amount)}</td>
                         <td className="text-secondary" style={{ minWidth: '12rem' }}>

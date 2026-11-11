@@ -99,7 +99,7 @@ export default function Judge() {
                 </>,
               ].map((text, i) => (
                 <li className="d-flex gap-3 small" key={i}>
-                  <span className="ag-step-num">{String(i + 1).padStart(2, '0')}</span>
+                  <span className="ag-step-num flex-none" style={{ width: 24, height: 24, fontSize: 12, borderRadius: 6 }}>{i + 1}</span>
                   <span className="text-secondary">{text}</span>
                 </li>
               ))}
