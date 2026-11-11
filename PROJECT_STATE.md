@@ -4,7 +4,7 @@
 > If a ⛔ MANUAL STOP is active, its checklist sits right under this line.
 
 ## Current phase
-**Phase 3: Web dashboard + Attack Lab**: in progress. ⛔ Manual Stop A is done: **Gate 0 PASS** and all 7 attacks as expected on testnet (2026-11-11).
+**Phase 4: README story + proof docs**: in progress. Phase 3 (web) is done; live checking of `/judge` happens in ⛔ Manual Stop B.
 
 ## Phase status
 | Phase | Status | Commit | Checks |
@@ -12,18 +12,40 @@
 | 1. Scaffold + contract | done | 959fa7f | `cargo test` 33/33 pass · fmt OK · clippy OK · `cargo near build` OK (198,680 bytes) |
 | 2. Scripts + classifier | done | 7bdf80c | `node --test` 46/46 pass · 12 dry-runs exit 0 |
 | ⛔ A. Gate 0 (Adesope) | **done: PASS** | ef878ce + evidence commit | Gate 0 4/4 PASS · Attack Suite 7/7 as expected · `node --test` 48/48 |
-| 3. Web + Attack Lab | in progress | | |
-| 4. README + proof docs | not started | | |
+| 3. Web + Attack Lab | done | see Phase 3 log | `npm run build` OK · `vitest` 21/21 · no hardcoded seed numbers |
+| 4. README + proof docs | in progress | | |
 | ⛔ B. Launch (Adesope) | waiting | | |
 
 ## Known facts
 - Network: testnet only (HACKATHON.md Q-010, Q-008).
-- The cloud sandbox can't reach NEAR RPC, the faucet or the explorer.
+- The cloud sandbox **can** read and send to NEAR testnet RPC (checked 2026-11-11 in Phase 3: `get_stats` from Node and the built web app in headless Chromium both returned live vault data). Account creation, deploys and owner actions still run on Adesope's machine because they need the owner key.
 - In this cloud sandbox `rustup target add wasm32-unknown-unknown` **works**, and `cargo install cargo-near --locked --no-default-features` works (default features need `libudev`). `cargo near build non-reproducible-wasm` builds the contract here.
 - near-api-js 7.5.2 (latest stable) needs **Node ≥ 22.22.2** (its `engines` field). The PRD says Node 20+; the scripts follow near-api-js, so use Node 22.22+.
 - near-sdk 5.30.1 refuses a plain native `cargo clippy` (it emits a compile_error telling you to use cargo-near). Working lint commands: `cargo clippy --all-targets -- -D warnings` (native, includes tests) and `cargo clippy --target wasm32-unknown-unknown -- -D warnings`.
 
 ## Log
+
+### Phase 3: Web dashboard + Attack Lab (2026-11-11)
+**Built** (PRD 9, `web/`, React 19 + Vite 8 + Bootstrap 5 + react-router 7 + near-api-js 7, no backend)
+- Shared code: the web imports `scripts/lib/{classify,attacks,format,config,chain}.js` and `config/seed.json` at build time, so the browser and `scripts/attacks.js` run the same attack definitions and classifier. `resolve.dedupe: ['near-api-js']` keeps one copy of near-api-js (the classifier's `instanceof` checks need that).
+- RPC: `VITE_NEAR_RPC` (optional, `web/.env.example`) then fastnear, then rpc.testnet.near.org. Views fall back across the list; signed attack calls use one provider (same reason as the Gate 0 fix).
+- **Layout**: red "REAL · NEAR TESTNET" banner on every page, navbar, footer with the vault account. If `config/seed.json` isn't seeded, a warning lists what is missing.
+- **`/` Overview**: tagline, the problem in two lines (Freysa / AIXBT with source links), vault balance and paid / held / blocked / total requests from `get_stats`, "Try to break it →" button to `/judge`, badge linking the vault's access-key tab on NearBlocks testnet.
+- **`/agents` Agents & Rules**: the api-buyer private key in a card with "This key is public on purpose. Try to drain the vault."; one card per agent from `get_agents` with public key, per-tx and daily cap, approved recipients, paid-today vs daily-cap bar, active / revoked chip.
+- **`/activity` Activity**: HELD queue on top (from `get_held`) with the copy-paste `node scripts/owner.js approve|reject <id>` command next to each item (owner actions stay CLI-only); payment log newest first (from `get_payments`) with status chips and reason codes. The contract doesn't store tx hashes, so the log links to the vault's page on the explorer instead of per-row txs.
+- **`/judge` Attack Lab**: numbered 60-second judge path, "Run all attacks" + one button per J1–J7, results table (attack, expected, actual, pass, proof = tx link or raw RPC error), live "today's total vs daily cap" meter refreshed after each attack.
+- Loading and error states on every chain read; an RPC failure shows the error, never placeholder numbers. Mobile: no horizontal overflow on /agents, /activity, /judge at iPhone 13 width (Playwright).
+- `vercel.json` SPA rewrite. Note for Manual Stop B: the app imports `../scripts/lib` and `../config`, so on Vercel set Root Directory = `web` **and** keep "Include files outside the root directory" on (Vercel's default), or build from the repo root.
+
+**Dependencies added (web only)**: `react`, `react-dom`, `react-router-dom`, `bootstrap`, `near-api-js`, `vite`, `@vitejs/plugin-react` (Vite's React plugin, needed for JSX), `vitest`. All in the CLAUDE.md allowed list except `@vitejs/plugin-react`, which is part of the Vite + React setup.
+
+**Files**: `web/{package.json,package-lock.json,vite.config.js,index.html,vercel.json,.env.example}`, `web/src/main.jsx`, `web/src/lib/{near,links,useChain,judge}.js`, `web/src/components/{Layout,ui}.jsx`, `web/src/pages/{Overview,Agents,Activity,Judge}.jsx`, `web/src/test/{classify,format,judge,no-hardcoded-numbers}.test.js`, `PROJECT_STATE.md`.
+
+**Checks (real output)**
+- `cd web && npm run build` → OK: `dist/assets/index-*.js 493.68 kB (gzip 153.94 kB)`, CSS 230.06 kB. One warning: `Module "util" has been externalized` from `generate-function` (pulled in by near-api-js's typed-contract helper, which the app doesn't use). Harmless.
+- `cd web && npx vitest run` → `Test Files 4 passed · Tests 21 passed`. classify + format (shared libs), attack runner against a **mock** RPC context (unit test only), and `no-hardcoded-numbers`: no cap / allowance / funding amount, owner account or demo private key written in `web/src`.
+- Live smoke test (not required by Phase 3, done because the sandbox can reach testnet): `vite preview` + headless Chromium. All four pages loaded live vault data with no page errors.
+- **One real testnet tx was sent during that smoke test**: "Run J3" on `/judge` with the public api-buyer key → payment #10, `BLOCKED_OVER_TX_CAP` (1 NEAR, nothing moved). The vault log now has 11 entries; this is not in `evidence/`.
 
 ### ⛔ Manual Stop A: Gate 0 on testnet (2026-11-11, Adesope's machine, WSL Ubuntu)
 **Accounts**: owner `agentgate-ayo.testnet` (faucet, 10 NEAR); `vault.agentgate-ayo.testnet` (3 NEAR); `api-provider`, `data-provider`, `hacker` `.agentgate-ayo.testnet` (0.1 NEAR each). Keys in his legacy keychain only.

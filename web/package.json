@@ -1,0 +1,27 @@
+{
+  "name": "agentgate-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "AgentGate dashboard and /judge Attack Lab (no backend)",
+  "license": "MIT",
+  "engines": { "node": ">=22.22.2" },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.8",
+    "near-api-js": "^7.5.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router-dom": "^7.18.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.3.0",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.0"
+  }
+}
