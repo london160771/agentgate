@@ -18,6 +18,11 @@ Before committing, check `git diff --cached`: only `config/seed.json` (demo keys
 
 After you paste the results: if Gate 0 passes, the classifier gets matched to the real error names, the evidence is saved and Phase 3 starts. If Gate 0 fails, the agent stops and reports; no redesign.
 
+### Gate 0 progress (Adesope's machine, WSL Ubuntu)
+- Done: tools installed, `npm test` 46/46 on his machine; accounts created (owner `agentgate-ayo.testnet`, vault, api-provider, data-provider, hacker); `deploy.sh` OK (wasm 198,614 bytes, `get_owner` = `agentgate-ayo.testnet`); `seed.js` OK (api-buyer key `ed25519:z28Hcnsj7hVXok3Dd4mNXepDkpYQdqiDYXf2qs7eR2S` = FunctionCall → vault, `[request_spend]`, 0.25 NEAR allowance; old-bot revoked).
+- Gate 0 run 1: (a) PASS (OK_PAID). (b)(c)(d) were refused by NEAR exactly as designed (raw: `AccessKeyNotEnoughAllowanceActionError`, `AccessKeyMethodNameMismatchActionError`, `AccessKeyDoesNotExistError`), but reported FAIL because near-api-js's FailoverRpcProvider re-sent each refused tx to the second RPC and wrapped the real error in `FailoverRpcError: Exceeded 2 providers`. Old-bot key confirmed gone from the vault.
+- Fixes: scripts use a single RPC provider; the classifier unwraps `FailoverRpcError`; J5 / Gate 0 (b) transfer is 0.01 NEAR (was 1 NEAR, more than the key's 0.25 allowance, so NEAR refused it on allowance before reaching the permission check). PRD section 8 J5 row updated to match; pending Adesope's OK.
+
 ## Current phase
 **⛔ Manual Stop A: Gate 0** (waiting for Adesope). Next after it: Phase 3, web dashboard + Attack Lab.
 

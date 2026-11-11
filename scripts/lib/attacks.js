@@ -68,7 +68,10 @@ export const ATTACKS = [
     name: 'Leaked key: direct transfer',
     expected: 'REFUSED_BY_NEAR: TRANSFER_NOT_ALLOWED',
     explain: 'The agent key signs a plain Transfer out of the vault. NEAR itself refuses: a Function Call Key cannot move NEAR.',
-    steps: (cfg) => [{ type: 'transfer', key: 'apiBuyer', to: cfg.recipients.hacker, amountNear: '1' }],
+    // 0.01 NEAR, below the key's 0.25 NEAR allowance, so NEAR reaches its permission
+    // check (RequiresFullAccess). A transfer bigger than the allowance is refused one step
+    // earlier with NotEnoughAllowance (seen in the first Gate 0 run).
+    steps: (cfg) => [{ type: 'transfer', key: 'apiBuyer', to: cfg.recipients.hacker, amountNear: '0.01' }],
     stepOk: refused('TRANSFER_NOT_ALLOWED'),
   },
   {

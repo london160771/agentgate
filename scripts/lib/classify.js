@@ -48,6 +48,8 @@ export function classifyResult(result) {
 
 /** Classify an error thrown by near-api-js (or any RPC client). */
 export function classifyError(error) {
+  // FailoverRpcError wraps the real errors in `.errors`; classify the first real one.
+  if (Array.isArray(error?.errors) && error.errors.length) return classifyError(error.errors[0]);
   const text = errorText(error);
   for (const r of NEAR_REFUSALS) {
     if (r.pattern.test(text)) {

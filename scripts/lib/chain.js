@@ -2,18 +2,22 @@
 // can use the same code. Private keys come from the caller (config demo keys
 // or the owner's local keychain), never from here.
 
-import { Account, FailoverRpcProvider, JsonRpcProvider, KeyPair, KeyPairSigner, getTransactionLastResult } from 'near-api-js';
+import { Account, JsonRpcProvider, KeyPair, KeyPairSigner, getTransactionLastResult } from 'near-api-js';
 
-/** Public testnet RPCs, tried in order. NEAR_RPC / VITE_NEAR_RPC goes first when set. */
+/** Public testnet RPCs. NEAR_RPC / VITE_NEAR_RPC overrides the first one. */
 export const TESTNET_RPCS = ['https://test.rpc.fastnear.com', 'https://rpc.testnet.near.org'];
 
 export const GAS_SPEND = 30_000_000_000_000n; // 30 TGas: request_spend logs one event and maybe one transfer
 export const GAS_OWNER = 50_000_000_000_000n; // 50 TGas: owner calls (add key, delete key, transfer)
 
+/**
+ * One RPC endpoint, on purpose. near-api-js's FailoverRpcProvider re-sends a
+ * transaction to the next RPC after ANY error (including NEAR's own refusals),
+ * then hides the real error inside "Exceeded N providers". Gate 0 showed that.
+ * A single provider gives us NEAR's real error and never double-sends.
+ */
 export function makeProvider(preferredUrl) {
-  const urls = [preferredUrl, ...TESTNET_RPCS].filter(Boolean);
-  const unique = [...new Set(urls)];
-  return new FailoverRpcProvider(unique.map((url) => new JsonRpcProvider({ url })));
+  return new JsonRpcProvider({ url: preferredUrl || TESTNET_RPCS[0] });
 }
 
 /** An Account that signs with one key. privateKey: "ed25519:..." */

@@ -7,6 +7,7 @@ import {
   AccessKeyDepositWithFunctionCallActionError,
   AccessKeyDoesNotExistError,
   AccessKeyMethodNameMismatchActionError,
+  AccessKeyNotEnoughAllowanceActionError,
   AccessKeyNotFoundActionError,
   AccessKeyRequiresFullAccessActionError,
   HostGuestPanicError,
@@ -59,6 +60,17 @@ test('minified class names: message and raw RPC kinds still match', () => {
   const raw = { name: 'Error', message: 'Server error', data: { TxExecutionError: { InvalidTxError: { InvalidAccessKeyError: { MethodNameMismatch: { method_name: 'update_rules' } } } } } };
   assert.equal(classifyError(raw).code, 'METHOD_NOT_ALLOWED');
   assert.equal(classifyError('InvalidAccessKeyError: RequiresFullAccess').code, 'TRANSFER_NOT_ALLOWED');
+});
+
+test('FailoverRpcError is unwrapped to the real NEAR error', () => {
+  const inner = new AccessKeyMethodNameMismatchActionError('update_rules', 0, '', '');
+  const wrapped = Object.assign(new Error('Exceeded 2 providers to execute request'), { name: 'FailoverRpcError', errors: [inner, inner] });
+  assert.equal(classifyError(wrapped).code, 'METHOD_NOT_ALLOWED');
+});
+
+test('not enough allowance is not mistaken for a permission refusal', () => {
+  const e = new AccessKeyNotEnoughAllowanceActionError('vault.x.testnet', 1n, 2n, 'ed25519:abc', null, '', '');
+  assert.equal(classifyError(e).kind, 'ERROR');
 });
 
 test('anything else → ERROR with the raw message', () => {
