@@ -3,8 +3,18 @@
 > Progress log. Updated by the coding agent at the end of every phase. Newest entry at the top.
 > If a ⛔ MANUAL STOP is active, its checklist sits right under this line.
 
+## ⛔ MANUAL STOP B: launch (Adesope)
+P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
+1. **Deploy the web to Vercel** (you, not the agent): vercel.com → Add New → Project → import `london160771/agentgate` → **Root Directory: `web`** → Framework: Vite (build `npm run build`, output `dist`) → Deploy. Leave "Include files outside the root directory in the Build Step" **on** (the default): the app imports `scripts/lib/` and `config/seed.json`. No env vars needed (`VITE_NEAR_RPC` is optional).
+2. **Run `/judge` once live**: open `<vercel-url>/judge`, press **Run all attacks**, check every row says as expected (J1 may say `BLOCKED_OVER_DAILY_CAP` if today's cap is used; that also passes). Then check `/`, `/agents`, `/activity` load numbers.
+3. **Record the video** (judge path: `/` → `/judge` Run all → vault access keys on the explorer → `/agents` public key).
+4. **Post on X**: tag @NEARProtocol, #NEARHackathon, attach the video.
+5. **Fill the TODO links** in `README.md` (search `TODO(Adesope)`: Vercel URL ×2, video URL, X post URL). Send them to the agent or edit them yourself.
+6. **Create the mainnet payout account** for the prize.
+7. **Submit the form before 16:00 UTC on 14 Nov 2026.**
+
 ## Current phase
-**Phase 4: README story + proof docs**: in progress. Phase 3 (web) is done; live checking of `/judge` happens in ⛔ Manual Stop B.
+**⛔ Manual Stop B: launch (Adesope)**. Phases 1–4 are done; the checklist is above. P1 starts only when Adesope says "go P1".
 
 ## Phase status
 | Phase | Status | Commit | Checks |
@@ -12,9 +22,9 @@
 | 1. Scaffold + contract | done | 959fa7f | `cargo test` 33/33 pass · fmt OK · clippy OK · `cargo near build` OK (198,680 bytes) |
 | 2. Scripts + classifier | done | 7bdf80c | `node --test` 46/46 pass · 12 dry-runs exit 0 |
 | ⛔ A. Gate 0 (Adesope) | **done: PASS** | ef878ce + evidence commit | Gate 0 4/4 PASS · Attack Suite 7/7 as expected · `node --test` 48/48 |
-| 3. Web + Attack Lab | done | see Phase 3 log | `npm run build` OK · `vitest` 21/21 · no hardcoded seed numbers |
-| 4. README + proof docs | in progress | | |
-| ⛔ B. Launch (Adesope) | waiting | | |
+| 3. Web + Attack Lab | done | 55ce9ee | `npm run build` OK · `vitest` 21/21 · no hardcoded seed numbers |
+| 4. README + proof docs | done | see Phase 4 log | numbers checked against `config/seed.json` + `evidence/`; tests re-run 33 / 48 / 21 pass |
+| ⛔ B. Launch (Adesope) | **active** | | checklist at the top |
 
 ## Known facts
 - Network: testnet only (HACKATHON.md Q-010, Q-008).
@@ -24,6 +34,22 @@
 - near-sdk 5.30.1 refuses a plain native `cargo clippy` (it emits a compile_error telling you to use cargo-near). Working lint commands: `cargo clippy --all-targets -- -D warnings` (native, includes tests) and `cargo clippy --target wasm32-unknown-unknown -- -D warnings`.
 
 ## Log
+
+### Phase 4: README story + proof docs (2026-11-11)
+**Built**
+- `README.md` final per PRD 12: story (Freysa, AIXBT, linked sources), insight, how it works + guarantee, the api-buyer key block (signer account, public and private key, "This key is public on purpose. Try to drain the vault."), "Try it in 60 seconds" (browser `/judge` path copied from the real `/judge` page, then the CLI path), Why NEAR table pointing to real functions (`add_agent` L63, `add_access_key_allowance` L94, `revoke_agent` L123, `request_spend` L174 in `contract/src/lib.rs`; `scripts/lib/classify.js`), Proof (test counts, Gate 0 table and Attack Suite table generated from the evidence JSON, all tx links), What's real, Honest limits (allowance and hold-queue max read from `config/seed.json`; vault still has its full-access key), Built at NEAR HACKATHON.
+- `REAL_VS_MOCKED.md` filled from `evidence/` (every "Real" row links a raw output or explorer page; `agent.js --mode=llm` marked as not run against a model).
+- `ROADMAP.md`: P1-a/b/c named as in PRD 11; added "store tx hash per payment" (found in Phase 3).
+- Only `TODO(Adesope)` placeholders left: Vercel URL (×2), video URL, X post URL.
+
+**Checks (real output)**
+- Numbers: caps 0.5 / 0.6, allowance 0.25, hold queue 20 are inserted from `config/seed.json`; every tx hash and result in the README tables is generated from `evidence/gate0.json` and `evidence/attacks-2026-11-11T12-57-38Z.json`.
+- "Try it": `node scripts/attacks.js --dry-run` and `--dry-run --only=J5` exit 0 and print the 7 / 1 attack plans; the browser steps match `web/src/pages/Judge.jsx`.
+- Vercel-like build: with `scripts/node_modules` removed, `cd web && npm run build` still passes and vitest 21/21 (the web only needs its own `node_modules`).
+- Tests re-run: `cargo test` 33 passed · `node --test` 48/48 · `npx vitest run` 21/21.
+- Secrets: `git log -p --all` has only two `ed25519:` private keys, the api-buyer and old-bot demo keys. No owner or vault key in the repo or its history.
+
+**Next**: ⛔ Manual Stop B (checklist at the top).
 
 ### Phase 3: Web dashboard + Attack Lab (2026-11-11)
 **Built** (PRD 9, `web/`, React 19 + Vite 8 + Bootstrap 5 + react-router 7 + near-api-js 7, no backend)
