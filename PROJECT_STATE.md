@@ -13,6 +13,7 @@ P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
 6. **Create the mainnet payout account** for the prize.
 6a. ~~**P1-b vault lock**~~ **DONE** 2026-11-11 18:17 UTC (tx `8mo1vVL7…`, `evidence/lock-2026-11-11T18-17-59Z.json`). Old instructions:, best after steps 1–2 so you know the contract needs no more changes: `cd ~/agentgate && git pull`, then `node scripts/lock-vault.js` (checks only, sends nothing), then `node scripts/lock-vault.js --confirm`. Attach the new `evidence/lock-<time>.json` in chat; the agent then updates README / REAL_VS_MOCKED with the proof.
 6b. ~~P1-a live check~~ **DONE** 2026-11-11 ~20:40 UTC: Adesope signed in with Meteor Wallet and rejected held payments from `/activity`; on chain `get_held` = [] and `get_stats` shows `rejected: 2`, `held_pending: 0`. Old instructions: **P1-a live check (owner buttons)**: MyNearWallet no longer accepts app connections (Nov 2026), so the site now uses **Meteor Wallet**. Put your owner account into Meteor on testnet: open https://wallet.meteorwallet.app, switch the network to **Testnet**, choose **Import account → private key**, and paste the `private_key` from `~/.near-credentials/testnet/agentgate-ayo.testnet.json` (shown by `cat ~/.near-credentials/testnet/agentgate-ayo.testnet.json`; never paste it in chat). Then on the site press **Owner sign in**, allow pop-ups, go to `/activity` and press **Reject** on held payment #3 (or do it on camera for the video). The wallet pop-up shows the tx; confirm it. The row should disappear and a tx link appear.
+6c. **Deploy the vault factory** (multi-user): `cd ~/agentgate && git pull && bash scripts/deploy-factory.sh`. Then on the site: My vaults → Connect wallet → Create vault (needs ~2.7 testnet NEAR in your wallet) → Add an agent.
 7. **Submit the form before 16:00 UTC on 14 Nov 2026.**
 
 ## Current phase
@@ -28,6 +29,7 @@ P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
 | 4. README + proof docs | done | 7617c37 | numbers checked against `config/seed.json` + `evidence/`; tests re-run 33 / 48 / 21 pass |
 | ⛔ B. Launch (Adesope) | **active** | | checklist at the top |
 | P1-b. Vault lock | done: script 638903e, lock run by Adesope 2026-11-11 18:17 UTC | 638903e | `node --test` 53/53 · dry run OK · live pre-check refuses a wrong key |
+| Multi-user v1 (factory + per-wallet dashboards) | built; factory deploy by Adesope | see log | factory `cargo test` 8/8 · `node --test` 54/54 · `vitest` 45/45 · build OK |
 | P1-a. Owner actions in UI | done (wallet now Meteor) | 549a60d | `vitest` 29/29 · build OK · wallet flow checked up to the MyNearWallet sign page; Meteor login pop-up checked |
 
 ## Known facts
@@ -38,6 +40,26 @@ P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
 - near-sdk 5.30.1 refuses a plain native `cargo clippy` (it emits a compile_error telling you to use cargo-near). Working lint commands: `cargo clippy --all-targets -- -D warnings` (native, includes tests) and `cargo clippy --target wasm32-unknown-unknown -- -D warnings`.
 
 ## Log
+
+### Multi-user v1: every wallet creates and runs its own vault (2026-11-11, Adesope: "we need a real multi-user product")
+Adesope asked for: a create-vault button after wallet sign-in, a wallet picker, and a separate dashboard per wallet. Built outside the original PRD at his request (P1-level work, "let's get to work").
+- **Factory contract** (`factory/`, new crate, near-sdk 5.30.1 like the vault): `create_vault(name)` (payable) creates `<name>.<factory>` in one batch: create account, transfer the whole deposit, deploy the vault code (`factory/res/agentgate_vault.wasm`, built from `contract/` by `factory/build-vault.sh`, 198,680 bytes), call `new(owner = caller)`. **No add_key action**, so each vault is locked from birth. Callback `on_vault_created` records the vault per owner or refunds the deposit if the batch failed. Min deposit = code storage + 0.7 NEAR reserve (computed on chain, shown by `get_info`). Max 20 vaults per owner. Names: 2–32 chars, lowercase/digits/`-`/`_`, no dots. Views `get_vaults(owner)`, `get_info()`. Global contracts (near-sdk feature) were considered and rejected: deploying one costs ~10× the storage.
+- **Factory account**: `factoryAccountId = agentgate.testnet` in `config/seed.json` (a free top-level testnet name; the owner account has too little NEAR for a sub-account). `scripts/deploy-factory.sh` creates it via the testnet faucet service if missing, deploys and calls `new`. **Adesope runs it** (never deployed by the agent).
+- **Web**: `/app` My vaults (signed out: connect prompt; signed in: your vaults with live stats + Create vault form that reads the minimum from the factory); `/v/:vaultId` vault dashboard for any vault (balance, lock badge, counts, Add funds, held queue with Approve/Reject, agents with Revoke, last 50 decisions). Owner buttons only show for the vault's owner. **Add an agent**: the browser makes an ed25519 key pair, the owner signs `add_agent`, then the private key + a near-api-js setup snippet are shown once with Copy (never stored). Navbar: Overview, My vaults, Attack lab, Demo activity, Demo rules, Docs. Hero CTA "Create your vault". Docs page: new "Get your own vault" section; README: new "Get your own vault" section. Footer now says the demo reads live from the demo vault.
+- No new dependencies (the factory uses near-sdk; the web uses near-api-js `KeyPair` already installed).
+
+**Files**: `factory/*` (new), `config/seed.json`, `scripts/lib/config.js`, `scripts/deploy-factory.sh` (new), `scripts/test/dry-run.test.js`, `web/src/lib/{factory.js (new), near.js, wallet.js, owner.js}`, `web/src/pages/{MyVaults.jsx, VaultDashboard.jsx (new), Overview.jsx, Docs.jsx}`, `web/src/components/{Wallet.jsx, Layout.jsx}`, `web/src/main.jsx`, `web/src/theme.css`, `web/src/test/{factory.test.js (new), owner.test.js}`, `README.md`, `REAL_VS_MOCKED.md`, `ROADMAP.md`.
+
+**Checks (real output)**
+- contract: fmt OK · `cargo clippy --all-targets` and `--target wasm32-unknown-unknown` 0 warnings · `cargo test` 33 passed.
+- factory: fmt OK · both clippy runs 0 warnings · `cargo test` **8 passed** (names, min deposit, create batch = create/transfer/deploy/call with no add_key and owner = caller, too-small deposit, bad name, callback success records, callback failure refunds, 20-vault limit). `cargo near build non-reproducible-wasm` OK (336,425 bytes).
+- scripts: `node --test` **54/54** (incl. `deploy-factory.sh --dry-run`).
+- web: `npx vitest run` **45/45** (12 new in `factory.test.js`) · `npm run build` OK.
+- Agent snippet checked against testnet: the exact near-api-js calls from the snippet, signed with the demo api-buyer key and amount 0, returned `{payment_id: 19, status: BLOCKED, code: BLOCKED_ZERO_AMOUNT}` (no money moved).
+- Headless Chromium (desktop 1366 + iPhone 13), no page errors, no horizontal overflow: `/app` signed out shows Connect wallet; `/app` with a mocked Meteor session (UI mock in the test browser only; a random key, signs nothing) shows "factory isn't reachable" with the real RPC error (`agentgate.testnet` does not exist yet); `/v/vault.agentgate-ayo.testnet` signed out = read-only, signed in as the owner = Add funds, Add an agent form, Revoke; `/v/<unknown>` = "Vault not found".
+- Not checked yet (needs Adesope): a real `create_vault` on testnet, a real web `add_agent`, an agent using the new key.
+
+**Next (Adesope)**: `cd ~/agentgate && git pull && bash scripts/deploy-factory.sh`, then create a vault from `/app` and add an agent.
 
 ### Web: "Connect wallet" picker (2026-11-11, Adesope asked why not an extension wallet)
 Navbar button renamed **Connect wallet** and now opens a small wallet menu (from the wallet selector's module list). Meteor Wallet uses its browser extension when installed, otherwise its pop-up. HERE Wallet and Intear Wallet were tried (`@near-wallet-selector/here-wallet` / `intear-wallet` 10.1.4) and left out: HERE threw `randomBytes is not a function` in the browser build, Intear opened no testnet sign-in; both packages uninstalled, no new dependency. Docs page and README text updated. Files: `web/src/lib/wallet.js`, `web/src/components/Wallet.jsx`, `web/src/theme.css`, `web/src/pages/Docs.jsx`, `README.md`. Checks: `npm run build` OK · `vitest` 31/31 · headless Chromium: menu lists Meteor Wallet; picking it opens `https://wallet.meteorwallet.app/connect/testnet/login?...`; no page errors.

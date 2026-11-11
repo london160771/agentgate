@@ -93,7 +93,17 @@ node scripts/attacks.js --dry-run    # print the plan, send nothing
 ```
 The 7 attacks are defined once in [`scripts/lib/attacks.js`](scripts/lib/attacks.js).
 
-**For the vault owner:** press **Connect wallet** in the navbar and pick a NEAR testnet wallet, e.g. [Meteor Wallet](https://wallet.meteorwallet.app) (its browser extension is used when installed). If you are the vault owner, `/activity` shows **Approve** and **Reject** next to each held payment and `/agents` shows **Revoke this agent**. Each button opens the wallet so you confirm the transaction there; the app asks for no access key of its own. Anyone else who signs in sees no buttons, and the contract refuses non-owners anyway (`ERR_NOT_OWNER`). The same actions work from the terminal: `node scripts/owner.js status | approve <id> | reject <id> | revoke <publicKey>`.
+**For the demo vault's owner:** press **Connect wallet** in the navbar and pick a NEAR testnet wallet, e.g. [Meteor Wallet](https://wallet.meteorwallet.app) (its browser extension is used when installed). `/activity` then shows **Approve** and **Reject** next to each held payment and `/agents` shows **Revoke this agent**. Each button opens the wallet so you confirm the transaction there; the app asks for no access key of its own. Anyone else who signs in sees no buttons, and the contract refuses non-owners anyway (`ERR_NOT_OWNER`). The same actions work from the terminal: `node scripts/owner.js status | approve <id> | reject <id> | revoke <publicKey>`.
+
+## Get your own vault
+Any NEAR testnet wallet can create its own vault and plug in its own agent. No signup, no backend.
+1. Get testnet NEAR from the [faucet](https://near-faucet.io). A vault needs about 2.7 NEAR (about 2 NEAR pays for storing the vault code; the rest is the vault's balance). The form shows the exact minimum, read from the factory.
+2. Open **[My vaults](https://agentgate-near.vercel.app/app)**, press **Connect wallet**, pick a name and press **Create vault**. One transaction to the factory (`factory/`) creates `<name>.agentgate.testnet` with you as owner. The factory adds **no access key** to the new account, so it is locked from birth: only the vault's rules can move its NEAR.
+3. On your vault's page press **Add an agent**: per-payment cap, daily cap, approved recipients. Your browser makes the key pair; the vault mints the public key as a Function Call Key that can only call `request_spend`.
+4. Copy the private key and the setup snippet (shown once) into your agent, like an API key. The site never stores it.
+5. Your agent calls `request_spend`. Every request appears on your vault page as PAID, HELD or BLOCKED; you approve or reject held ones, add funds, or revoke the agent.
+
+Each wallet sees the vaults it created at `/app`; every vault has its own page at `/v/<vault id>`.
 
 ## Why NEAR
 On most chains one key controls everything, so agent-wallet tools need an off-chain policy server or a smart-account wrapper in front of it. NEAR accounts can hold many keys with different powers, built into the protocol. AgentGate turns that into agent allowances.
@@ -109,8 +119,9 @@ On most chains one key controls everything, so agent-wallet tools need an off-ch
 ## Proof
 **Tests** (offline, run in the cloud build on 2026-11-11):
 - Contract: `cd contract && cargo test` → **33 passed**, including a 500-request random run that checks the guarantee after every request.
-- Scripts: `cd scripts && node --test` → **53 passed**.
-- Web: `cd web && npx vitest run` → **30 passed**.
+- Factory: `cd factory && cargo test` → **8 passed** (the create batch has no add-key action, failed creates refund the owner).
+- Scripts: `cd scripts && node --test` → **54 passed**.
+- Web: `cd web && npx vitest run` → **45 passed**.
 
 **Gate 0** (can a contract-minted key really be limited by NEAR?), testnet, 2026-11-11, raw output in [`evidence/gate0.json`](evidence/gate0.json): **PASS 4/4**.
 
@@ -151,7 +162,7 @@ Gate 0, the Attack Suite and the dashboard numbers are real NEAR testnet results
 
 **Long-term goal: any AI agent can hold a budget safely, and anyone can check the rules it spends under.** The model may be fooled, but the money follows rules that the chain enforces.
 
-1. **Today (this hackathon): Agent Firewall.** One vault, contract-minted keys, per-payment and daily caps, an approved-recipient list, a human approval queue, and a locked vault. Live on testnet.
+1. **Today (this hackathon): Agent Firewall.** A vault for every wallet, contract-minted keys, per-payment and daily caps, an approved-recipient list, a human approval queue, and locked vaults. The demo vault is live on testnet; the vault factory goes live once deployed.
 2. **Next: mainnet and real budgets.** A contract review, then mainnet. Stablecoin budgets (NEP-141, e.g. USDC on NEAR), per-recipient caps and rate limits, and a public "drain me" vault with the key posted.
 3. **Then: one budget for many agents (Swarm Guard).** A team runs many agents from one shared budget, and each agent gets its own sub-limit.
 4. **Then: spend anywhere under the same rules.** Payments through NEAR Intents and Chain Signatures, so an agent can pay on other chains while the vault on NEAR still decides.
