@@ -105,29 +105,38 @@ export default function Overview() {
   return (
     <>
       <section className="ag-hero">
-        <div className="row g-5 align-items-center">
+        <div className="row g-4 g-lg-5 align-items-stretch">
           <div className="col-12 col-lg-6 ag-enter">
-            <a className="ag-eyebrow" href={accountLink(cfg.vaultAccountId)} target="_blank" rel="noreferrer">
-              <span className="ag-dot" aria-hidden="true" />
-              Live on NEAR testnet · real transactions
-            </a>
-            <h1>
-              The AI can be fooled.
-              <br />
-              <span className="ag-hero-em">The money can’t.</span>
-            </h1>
-            <p className="ag-hero-sub">
-              AgentGate is a NEAR vault for AI agents. The agent’s key can only <em className="fst-normal text-body">ask</em> the vault to pay,
-              and the contract decides what money moves.
-            </p>
-            <div className="d-flex flex-wrap gap-3">
-              <Link to="/judge" className="btn btn-primary btn-lg btn-icon-end d-inline-flex align-items-center gap-2">
-                Try to break it
-                <Icon name="arrowRight" />
-              </Link>
-              <Link to="/agents" className="btn btn-quiet btn-lg">
-                See the rules
-              </Link>
+            <div className="ag-hero-copy">
+              <img
+                className="ag-hero-copy-photo"
+                src="/hero-circuit-1400.webp"
+                srcSet="/hero-circuit-800.webp 800w, /hero-circuit-1400.webp 1400w"
+                sizes="(min-width: 992px) 50vw, 100vw"
+                alt=""
+              />
+              <a className="ag-eyebrow" href={accountLink(cfg.vaultAccountId)} target="_blank" rel="noreferrer">
+                <span className="ag-dot" aria-hidden="true" />
+                Live on NEAR testnet · real transactions
+              </a>
+              <h1>
+                The AI can be fooled.
+                <br />
+                <span className="ag-hero-em">The money can’t.</span>
+              </h1>
+              <p className="ag-hero-sub">
+                AgentGate is a NEAR vault for AI agents. The agent’s key can only <em className="fst-normal ag-hero-ask">ask</em> the vault to pay,
+                and the contract decides what money moves.
+              </p>
+              <div className="d-flex flex-wrap gap-3">
+                <Link to="/judge" className="btn btn-primary btn-lg btn-icon-end d-inline-flex align-items-center gap-2">
+                  Try to break it
+                  <Icon name="arrowRight" />
+                </Link>
+                <Link to="/agents" className="btn btn-quiet btn-lg">
+                  See the rules
+                </Link>
+              </div>
             </div>
           </div>
           <div className="col-12 col-lg-6">
@@ -140,9 +149,6 @@ export default function Overview() {
                 alt=""
               />
               <LedgerCard />
-              <a className="ag-photo-credit" href="https://unsplash.com/photos/steel-bank-vault-door-locking-wheel-3wPJxh-piRw" target="_blank" rel="noreferrer">
-                Photo: Jason Dent / Unsplash
-              </a>
             </div>
           </div>
         </div>
