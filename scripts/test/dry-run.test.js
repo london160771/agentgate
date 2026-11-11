@@ -13,6 +13,7 @@ const run = (cmd, args) => execFileSync(cmd, args, { cwd: ROOT, encoding: 'utf8'
 const RUNS = [
   ['node', ['scripts/seed.js', '--dry-run']],
   ['node', ['scripts/gate0.js', '--dry-run']],
+  ['node', ['scripts/lock-vault.js', '--dry-run']],
   ['node', ['scripts/attacks.js', '--dry-run']],
   ['node', ['scripts/attacks.js', '--dry-run', '--only=J4']],
   ['node', ['scripts/owner.js', 'status', '--dry-run']],

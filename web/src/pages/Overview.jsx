@@ -2,7 +2,8 @@ import { Link } from 'react-router-dom';
 import { formatNear } from '../../../scripts/lib/format.js';
 import { ChainView } from '../components/ui.jsx';
 import { accessKeysLink } from '../lib/links.js';
-import { cfg, viewVault } from '../lib/near.js';
+import { lockStatus } from '../../../scripts/lib/lock.js';
+import { cfg, vaultAccessKeys, viewVault } from '../lib/near.js';
 import { useChain } from '../lib/useChain.js';
 
 function Stat({ label, value, tone = 'body' }) {
@@ -13,6 +14,21 @@ function Stat({ label, value, tone = 'body' }) {
         <div className={`fs-4 fw-semibold text-${tone}`}>{value}</div>
       </div>
     </div>
+  );
+}
+
+/** Live lock status (P1-b): locked = no full-access key on the vault account. */
+function LockBadge() {
+  const keys = useChain(vaultAccessKeys);
+  if (keys.loading) return <span className="badge text-bg-light border p-2">Checking vault keys…</span>;
+  if (keys.error) return <span className="badge text-bg-warning p-2 text-wrap">Could not read the vault keys: {String(keys.error.message || keys.error)}</span>;
+  const s = lockStatus(keys.data);
+  return (
+    <a className={`badge p-2 text-wrap text-start ${s.locked ? 'text-bg-success' : 'text-bg-secondary'}`} href={accessKeysLink(cfg.vaultAccountId)} target="_blank" rel="noreferrer">
+      {s.locked
+        ? 'Vault locked: no full-access key. Not even the owner can move the NEAR outside the rules ↗'
+        : `Vault not locked yet: ${s.fullAccess.length} full-access key on the vault account ↗`}
+    </a>
   );
 }
 
@@ -40,6 +56,7 @@ export default function Overview() {
           <a className="badge text-bg-light border text-wrap text-start p-2" href={accessKeysLink(cfg.vaultAccountId)} target="_blank" rel="noreferrer">
             Agent key permission on the explorer: FunctionCall → {cfg.vaultAccountId}, method request_spend only ↗
           </a>
+          <LockBadge />
         </div>
       </section>
 

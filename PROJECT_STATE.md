@@ -11,11 +11,12 @@ P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
 4. **Post on X**: tag @NEARProtocol, #NEARHackathon, attach the video.
 5. **Fill the TODO links** in `README.md` (search `TODO(Adesope)`: Vercel URL ×2, video URL, X post URL). Send them to the agent or edit them yourself.
 6. **Create the mainnet payout account** for the prize.
+6a. **P1-b vault lock (permanent)**, best after steps 1–2 so you know the contract needs no more changes: `cd ~/agentgate && git pull`, then `node scripts/lock-vault.js` (checks only, sends nothing), then `node scripts/lock-vault.js --confirm`. Attach the new `evidence/lock-<time>.json` in chat; the agent then updates README / REAL_VS_MOCKED with the proof.
 6b. **P1-a live check (owner buttons)**: put your owner account into MyNearWallet testnet with `near account export-account agentgate-ayo.testnet using-web-wallet network-config testnet` (it opens or prints a testnet.mynearwallet.com import link; open it in your browser). Then on the site press **Owner sign in**, allow pop-ups, go to `/activity` and press **Reject** on held payment #3 (or do it on camera for the video). The wallet pop-up shows the tx; confirm it. The row should disappear and a tx link appear.
 7. **Submit the form before 16:00 UTC on 14 Nov 2026.**
 
 ## Current phase
-**⛔ Manual Stop B: launch (Adesope)**. Phases 1–4 are done; the checklist is above. Adesope said "go p1a" (2026-11-11 15:02 UTC): **P1-a done** (owner buttons). P1-b and P1-c not started.
+**⛔ Manual Stop B: launch (Adesope)**. Phases 1–4 are done; the checklist is above. Adesope said "go p1a" (2026-11-11 15:02 UTC): **P1-a done** (owner buttons). Adesope said "go p1b" (15:30 UTC): **P1-b script ready**, waiting for Adesope to run the lock (step 6a). P1-c stays roadmap / vision only (Adesope, 15:30 UTC).
 
 ## Phase status
 | Phase | Status | Commit | Checks |
@@ -26,6 +27,7 @@ P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
 | 3. Web + Attack Lab | done | 55ce9ee | `npm run build` OK · `vitest` 21/21 · no hardcoded seed numbers |
 | 4. README + proof docs | done | 7617c37 | numbers checked against `config/seed.json` + `evidence/`; tests re-run 33 / 48 / 21 pass |
 | ⛔ B. Launch (Adesope) | **active** | | checklist at the top |
+| P1-b. Vault lock | script done; lock not run yet | see P1-b log | `node --test` 53/53 · dry run OK · live pre-check refuses a wrong key |
 | P1-a. Owner actions in UI | done | 549a60d | `vitest` 29/29 · build OK · wallet flow checked up to the MyNearWallet sign page |
 
 ## Known facts
@@ -36,6 +38,23 @@ P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
 - near-sdk 5.30.1 refuses a plain native `cargo clippy` (it emits a compile_error telling you to use cargo-near). Working lint commands: `cargo clippy --all-targets -- -D warnings` (native, includes tests) and `cargo clippy --target wasm32-unknown-unknown -- -D warnings`.
 
 ## Log
+
+### P1-b: Vault lock, script side (2026-11-11, after "go p1b")
+**Built**
+- `scripts/lib/lock.js` (pure, shared with the web): `lockStatus(keyList)` (locked = no FullAccess key), `lockProblems(...)` (refuses if already locked, if `get_owner` is unreadable / the vault itself / not the config owner, if the api-buyer key is missing or not limited to `request_spend` on the vault, or if the key on this machine is not one of the vault's full-access keys), `deleteOrder` (signing key last).
+- `scripts/lock-vault.js`: reads the vault's key list and `get_owner`, runs the checks, and **without `--confirm` sends nothing** and prints what it would delete. With `--confirm`: one tx from the vault, signed with its key from `~/.near-credentials/testnet/`, with a `DeleteKey` for every full-access key; then re-reads the list and writes `evidence/lock-<time>.json` (before / after lists, tx hash, public keys only). `--dry-run` makes no network calls.
+- Web `/` Overview: live badge from the vault's access-key list: "Vault locked: no full-access key…" (green) or "Vault not locked yet: N full-access key…". `web/src/lib/near.js` gained `vaultAccessKeys()` with the same RPC fallback as views.
+- No contract change. After the lock, owner methods keep working (signed by the owner account). `scripts/deploy.sh` can never redeploy this vault again; a contract change would need a new vault.
+- ROADMAP: P1-c (agent passport) moved to "Vision" as Adesope asked.
+
+**Files**: `scripts/lib/lock.js`, `scripts/lock-vault.js`, `scripts/test/lock.test.js`, `scripts/test/dry-run.test.js`, `web/src/lib/near.js`, `web/src/pages/Overview.jsx`, `ROADMAP.md`, `PROJECT_STATE.md`.
+
+**Checks (real output)**
+- `cd scripts && node --test` → `# tests 53 · # pass 53 · # fail 0` (4 new lock tests; key lists there are test data shaped like `evidence/gate0.json`; +1 dry-run).
+- `node scripts/lock-vault.js --dry-run` → prints the 5-step plan, exit 0.
+- Live pre-check from the sandbox with a throwaway key as the "vault key" and `--confirm`: read `get_owner` = `agentgate-ayo.testnet`, 1 full-access key `ed25519:3zfLDHfU…`, api-buyer FunctionCall → vault [request_spend]; then refused ("the key found on this machine … is not a full-access key of the vault"), exit 1, nothing sent.
+- DeleteKey action built offline with near-api-js 7.5.3 and borsh-encoded (173-byte tx). The real lock tx is not run here (needs the vault key).
+- `cd web && npx vitest run` → 29/29 · `npm run build` OK · headless Chromium: `/` shows "Vault not locked yet: 1 full-access key on the vault account", no page errors.
 
 ### P1-a: Owner actions in the web app (2026-11-11, after "go p1a")
 **Built**
