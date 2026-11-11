@@ -1,5 +1,5 @@
 // Owner sign-in state shared by every page, plus the owner action button (P1-a).
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { txLink } from '../lib/links.js';
 import { viewVault } from '../lib/near.js';
 import { isOwner, outcomeFailure, outcomeHash } from '../lib/owner.js';
@@ -38,22 +38,65 @@ export function WalletProvider({ children }) {
     owner,
     error,
     isOwner: isOwner(accountId, owner),
-    signIn: () => loadWallet().then((m) => m.signIn()).catch((e) => setError(e)),
+    choices: () => loadWallet().then((m) => m.walletChoices()),
+    signIn: (walletId) => loadWallet().then((m) => m.signIn(walletId)).catch((e) => setError(e)),
     signOut: () => loadWallet().then((m) => m.signOut()).catch((e) => setError(e)),
   };
   return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>;
 }
 
-/** Navbar control: owner sign in / who is signed in / sign out. */
+/** Small menu of wallets to sign in with (Meteor uses its extension when installed). */
+function WalletPicker() {
+  const w = useWallet();
+  const [open, setOpen] = useState(false);
+  const [list, setList] = useState(null);
+  const box = useRef(null);
+  useEffect(() => {
+    if (!open) return undefined;
+    w.choices().then(setList, () => setList([]));
+    const close = (e) => {
+      if (e.type === 'keydown' ? e.key === 'Escape' : !box.current?.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener('mousedown', close);
+    document.addEventListener('keydown', close);
+    return () => {
+      document.removeEventListener('mousedown', close);
+      document.removeEventListener('keydown', close);
+    };
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+  const pick = (id) => {
+    setOpen(false);
+    w.signIn(id);
+  };
+  return (
+    <div className="ag-picker" ref={box}>
+      <button className="btn btn-sm btn-quiet" aria-expanded={open} aria-haspopup="menu" onClick={() => setOpen((o) => !o)}>
+        Connect wallet
+      </button>
+      {open && (
+        <div className="ag-picker-menu" role="menu">
+          <div className="ag-label px-2 pb-2">NEAR testnet wallets</div>
+          {list === null && <div className="small text-secondary px-2 py-2">Loading wallets…</div>}
+          {list?.map((x) => (
+            <button key={x.id} role="menuitem" className="ag-picker-item" onClick={() => pick(x.id)}>
+              {x.icon && <img src={x.icon} alt="" width="24" height="24" />}
+              <span>
+                <span className="d-block fw-medium">{x.name}</span>
+                {x.description && <span className="d-block ag-label text-truncate">{x.description}</span>}
+              </span>
+            </button>
+          ))}
+          <div className="ag-label px-2 pt-2">Only the vault owner gets approve, reject and revoke buttons.</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Navbar control: connect wallet / who is signed in / sign out. */
 export function WalletControl() {
   const w = useWallet();
-  if (!w.accountId) {
-    return (
-      <button className="btn btn-sm btn-quiet" onClick={w.signIn}>
-        Owner sign in
-      </button>
-    );
-  }
+  if (!w.accountId) return <WalletPicker />;
   return (
     <div className="d-flex align-items-center gap-2 small">
       <span className={`ag-stamp ag-stamp--${w.isOwner ? 'paid' : 'neutral'}`}>{w.isOwner ? 'owner' : 'not the owner'}</span>

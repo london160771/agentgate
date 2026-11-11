@@ -93,7 +93,7 @@ node scripts/attacks.js --dry-run    # print the plan, send nothing
 ```
 The 7 attacks are defined once in [`scripts/lib/attacks.js`](scripts/lib/attacks.js).
 
-**For the vault owner:** press **Owner sign in** in the navbar and sign in with [Meteor Wallet](https://wallet.meteorwallet.app) (testnet). If you are the vault owner, `/activity` shows **Approve** and **Reject** next to each held payment and `/agents` shows **Revoke this agent**. Each button opens the wallet so you confirm the transaction there; the app asks for no access key of its own. Anyone else who signs in sees no buttons, and the contract refuses non-owners anyway (`ERR_NOT_OWNER`). The same actions work from the terminal: `node scripts/owner.js status | approve <id> | reject <id> | revoke <publicKey>`.
+**For the vault owner:** press **Connect wallet** in the navbar and pick a NEAR testnet wallet, e.g. [Meteor Wallet](https://wallet.meteorwallet.app) (its browser extension is used when installed). If you are the vault owner, `/activity` shows **Approve** and **Reject** next to each held payment and `/agents` shows **Revoke this agent**. Each button opens the wallet so you confirm the transaction there; the app asks for no access key of its own. Anyone else who signs in sees no buttons, and the contract refuses non-owners anyway (`ERR_NOT_OWNER`). The same actions work from the terminal: `node scripts/owner.js status | approve <id> | reject <id> | revoke <publicKey>`.
 
 ## Why NEAR
 On most chains one key controls everything, so agent-wallet tools need an off-chain policy server or a smart-account wrapper in front of it. NEAR accounts can hold many keys with different powers, built into the protocol. AgentGate turns that into agent allowances.
