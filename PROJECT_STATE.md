@@ -27,7 +27,7 @@ P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
 | 3. Web + Attack Lab | done | 55ce9ee | `npm run build` OK · `vitest` 21/21 · no hardcoded seed numbers |
 | 4. README + proof docs | done | 7617c37 | numbers checked against `config/seed.json` + `evidence/`; tests re-run 33 / 48 / 21 pass |
 | ⛔ B. Launch (Adesope) | **active** | | checklist at the top |
-| P1-b. Vault lock | script done; lock not run yet | see P1-b log | `node --test` 53/53 · dry run OK · live pre-check refuses a wrong key |
+| P1-b. Vault lock | script done (638903e); lock not run yet | 638903e | `node --test` 53/53 · dry run OK · live pre-check refuses a wrong key |
 | P1-a. Owner actions in UI | done | 549a60d | `vitest` 29/29 · build OK · wallet flow checked up to the MyNearWallet sign page |
 
 ## Known facts
