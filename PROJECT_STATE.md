@@ -5,7 +5,7 @@
 
 ## ⛔ MANUAL STOP B: launch (Adesope)
 P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
-1. **Deploy the web to Vercel** (you, not the agent): vercel.com → Add New → Project → import `london160771/agentgate` → **Root Directory: `web`** → Framework: Vite (build `npm run build`, output `dist`) → Deploy. Leave "Include files outside the root directory in the Build Step" **on** (the default): the app imports `scripts/lib/` and `config/seed.json`. No env vars needed (`VITE_NEAR_RPC` is optional).
+1. ✅ **Deployed** by Adesope 2026-11-11: https://agentgate-near.vercel.app (agent checked all 4 pages load live data, HTTP 200, no page errors). ~~Deploy the web to Vercel~~ (you, not the agent): vercel.com → Add New → Project → import `london160771/agentgate` → **Root Directory: `web`** → Framework: Vite (build `npm run build`, output `dist`) → Deploy. Leave "Include files outside the root directory in the Build Step" **on** (the default): the app imports `scripts/lib/` and `config/seed.json`. No env vars needed (`VITE_NEAR_RPC` is optional).
 2. **Run `/judge` once live**: open `<vercel-url>/judge`, press **Run all attacks**, check every row says as expected (J1 may say `BLOCKED_OVER_DAILY_CAP` if today's cap is used; that also passes). Then check `/`, `/agents`, `/activity` load numbers.
 3. **Record the video** (judge path: `/` → `/judge` Run all → vault access keys on the explorer → `/agents` public key).
 4. **Post on X**: tag @NEARProtocol, #NEARHackathon, attach the video.

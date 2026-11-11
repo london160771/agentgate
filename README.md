@@ -5,7 +5,7 @@
 AgentGate is a NEAR vault for AI agents. Your agent gets a key that can only *ask* the vault to pay. The vault decides if money moves, and the NEAR protocol makes sure the key can't do anything else.
 
 > Built at **NEAR HACKATHON** (1–14 Nov 2026) · Tracks: AI Security & Defense, Agent Economy · Network: NEAR testnet
-> 🔗 Live demo: `TODO(Adesope): Vercel URL` · 🎥 Video: `TODO(Adesope): video URL` · 𝕏 Post: `TODO(Adesope): X post URL`
+> 🔗 Live demo: [agentgate-near.vercel.app](https://agentgate-near.vercel.app) · 🎥 Video: `TODO(Adesope): video URL` · 𝕏 Post: `TODO(Adesope): X post URL`
 > Vault on testnet: [`vault.agentgate-ayo.testnet`](https://testnet.nearblocks.io/address/vault.agentgate-ayo.testnet) · [its access keys](https://testnet.nearblocks.io/address/vault.agentgate-ayo.testnet?tab=accesskeys)
 
 ---
@@ -63,7 +63,7 @@ This is the real agent key for our testnet vault (also in [`config/seed.json`](c
 
 ## Try it in 60 seconds
 **In the browser (no wallet, no signup):**
-1. Open `TODO(Adesope): Vercel URL`**/judge**.
+1. Open **[agentgate-near.vercel.app/judge](https://agentgate-near.vercel.app/judge)**.
 2. Press **Run all attacks**. Each of the 7 attacks (J1–J7) signs a real testnet transaction with the public key above, in your browser.
 3. Read each row: expected result, actual result, and the proof (explorer link, or NEAR's raw refusal).
 4. Watch the meter: today's total never goes past the daily cap, however often you run J4.
