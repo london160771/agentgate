@@ -20,24 +20,19 @@ function LockLine() {
   );
 }
 
-function Count({ label, value, kind, note }) {
+function Count({ label, value, kind }) {
   return (
-    <div className="col-4">
-      <div className="ag-figure ag-count">
-        {value}
-      </div>
-      <div className="mt-2">
-        <span className={`ag-stamp ag-stamp--${kind}`}>{label}</span>
-      </div>
-      {note && <div className="ag-label mt-1">{note}</div>}
-    </div>
+    <span className="ag-tally">
+      <span className="ag-count">{value}</span>
+      <span className={`ag-stamp ag-stamp--${kind}`}>{label}</span>
+    </span>
   );
 }
 
 /** The moment: the vault's real latest decisions, as a ledger card. */
 function LedgerCard() {
   const stats = useChain(() => viewVault('get_stats'));
-  const latest = useChain(() => viewVault('get_payments', { from_index: 0, limit: cfg.logMax }).then((l) => [...l].reverse().slice(0, 2)));
+  const latest = useChain(() => viewVault('get_payments', { from_index: 0, limit: cfg.logMax }).then((l) => [...l].reverse().slice(0, 1)));
   return (
     <div className="ag-ledger-card ag-enter-2">
       <div className="ag-card-head">
@@ -48,22 +43,21 @@ function LedgerCard() {
         <ChainView state={stats} what="Reading vault stats">
           {(s) => (
             <>
-              <div className="ag-label mb-2">Balance</div>
-              <div className="ag-figure mb-4">{formatNear(s.vault_balance)}</div>
-              <div className="row g-3 mb-3">
+              <div className="ag-label mb-1">Balance</div>
+              <div className="ag-figure mb-3">{formatNear(s.vault_balance)}</div>
+              <div className="d-flex flex-wrap gap-3 mb-2">
                 <Count label="PAID" value={s.paid} kind="paid" />
-                <Count label="HELD" value={s.held} kind="held" note={`${s.held_pending} waiting`} />
+                <Count label="HELD" value={s.held} kind="held" />
                 <Count label="BLOCKED" value={s.blocked} kind="blocked" />
               </div>
-              <p className="ag-label mb-4">
-                {formatNear(s.total_paid)} paid by agents · {formatNear(s.total_approved)} approved by the owner · {s.total_requests} requests. NEAR’s own
-                refusals never reach the vault, so they aren’t counted here.
+              <p className="ag-label mb-3">
+                {s.total_requests} requests · {formatNear(s.total_paid)} paid by agents · {s.held_pending} waiting for the owner
               </p>
             </>
           )}
         </ChainView>
-        <div className="ag-label mb-2">Latest decisions</div>
-        <div className="ag-raised px-3 py-3">
+        <div className="ag-label mb-2">Latest decision</div>
+        <div className="ag-raised px-3 py-2">
           <ChainView state={latest} what="Reading the payment log">
             {(list) =>
               list.length === 0 ? (

@@ -202,20 +202,21 @@ code { font-size: 0.85em; color: var(--ag-text); background: var(--ag-surface-su
 .ag-gauge-fill.is-over { background: var(--ag-blocked); }
 
 /* ---------- home hero ---------- */
-.ag-hero { padding: 48px 0 8px; }
+.ag-hero { padding: 32px 0 8px; }
 .ag-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--ag-text-2); background: var(--ag-surface); padding: 4px 12px 4px 10px; border-radius: 999px; box-shadow: var(--ag-shadow-border); margin-bottom: 24px; }
 .ag-hero h1 { font-size: clamp(32px, 3.6vw, 46px); line-height: 1.1; letter-spacing: -0.025em; font-weight: 500; margin: 0 0 16px; text-wrap: balance; }
 .ag-hero h1 .ag-hero-em { color: var(--ag-accent); }
 .ag-hero-sub { font-size: 17px; line-height: 27px; color: var(--ag-text-2); max-width: 32rem; margin: 0 0 28px; text-wrap: pretty; }
 .ag-ledger-card .ag-figure { font-size: 24px; }
-.ag-ledger-card .ag-count { font-size: 20px; }
+.ag-tally { display: inline-flex; align-items: center; gap: 8px; }
+.ag-ledger-card .ag-count { font-size: 20px; line-height: 1; font-weight: 600; font-variant-numeric: tabular-nums; }
 /* Hero photos (Unsplash License, free to use, no credit required): vault door by Jason Dent, circuit board by Олександр К. The vault door's wheel shows above the ledger card. */
 .ag-hero-visual { position: relative; }
-.ag-hero-photo { display: block; width: 100%; height: 260px; object-fit: cover; object-position: center 78%; border-radius: 22px; background: var(--zinc-800); box-shadow: var(--ag-shadow-border); }
-.ag-hero-visual .ag-ledger-card { position: relative; margin: -96px 24px 0; }
+.ag-hero-photo { display: block; width: 100%; height: 170px; object-fit: cover; object-position: center 72%; border-radius: 22px; background: var(--zinc-800); box-shadow: var(--ag-shadow-border); }
+.ag-hero-visual .ag-ledger-card { position: relative; margin: -64px 24px 0; }
 a.ag-eyebrow { text-decoration: none; }
 /* Left hero panel: dark blue circuit-board photo under a navy scrim, so white text stays readable. */
-.ag-hero-copy { position: relative; isolation: isolate; overflow: hidden; height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 48px 44px; border-radius: 22px; background: #0b1230; color: #fff; box-shadow: var(--ag-shadow-border); }
+.ag-hero-copy { position: relative; isolation: isolate; overflow: hidden; height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 36px 40px; border-radius: 22px; background: #0b1230; color: #fff; box-shadow: var(--ag-shadow-border); }
 .ag-hero-copy-photo { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; }
 .ag-hero-copy::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(100deg, rgba(8, 12, 36, 0.9) 0%, rgba(8, 12, 36, 0.78) 55%, rgba(8, 12, 36, 0.55) 100%); }
 .ag-hero-copy h1 { color: #fff; }
@@ -227,7 +228,7 @@ a.ag-eyebrow { text-decoration: none; }
 .ag-ledger-card { background: var(--ag-surface); border: 1px solid transparent; border-radius: 18px; box-shadow: var(--ag-shadow-float); overflow: hidden; }
 .ag-ledger-card .ag-card-head { padding: 14px 20px; background: var(--ag-surface-muted); border-bottom: 1px solid var(--ag-line); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .ag-ledger-card .ag-card-foot { padding: 14px 20px; background: var(--ag-surface-muted); border-top: 1px solid var(--ag-line); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
-.ag-ledger-card .ag-card-body { padding: 20px; }
+.ag-ledger-card .ag-card-body { padding: 16px 20px; }
 .ag-receipt { display: grid; grid-template-columns: 1fr auto; gap: 8px 12px; align-items: center; padding: 12px 0; border-top: 1px dashed var(--zinc-300); }
 .ag-receipt:first-child { border-top: 0; padding-top: 0; }
 .ag-receipt:last-child { padding-bottom: 0; }
@@ -239,9 +240,9 @@ a.ag-eyebrow { text-decoration: none; }
 
 @media (max-width: 767.98px) {
   .ag-hero { padding: 32px 0 8px; }
-  .ag-hero-photo { height: 220px; border-radius: 18px; }
+  .ag-hero-photo { height: 150px; border-radius: 18px; }
   .ag-hero-copy { padding: 32px 22px; border-radius: 18px; }
-  .ag-hero-visual .ag-ledger-card { margin: -72px 10px 0; }
+  .ag-hero-visual .ag-ledger-card { margin: -56px 10px 0; }
   .ag-hero-sub { font-size: 16px; line-height: 25px; }
   .ag-section { margin-top: 56px; }
   .ag-page-title { font-size: 28px; }

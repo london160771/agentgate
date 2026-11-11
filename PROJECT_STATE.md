@@ -39,6 +39,9 @@ P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
 
 ## Log
 
+### Web: shorter hero for laptops (2026-11-11, Adesope: "hero section is too tall on laptop")
+Vault card compacted: counts on one line next to their stamps, one short totals line, 1 latest decision (was 2); vault photo strip 260px → 170px (150px on phones); left panel and hero padding reduced. Hero height at 1536×730 is about 610px (was about 895px), so it fits a laptop screen. Files: `web/src/pages/Overview.jsx`, `web/src/theme.css`. Checks: `npm run build` OK · `vitest` 31/31 · headless Chromium 1536px and iPhone 13: no overflow, no page errors.
+
 ### Web: photo behind the hero text, photo credit removed (2026-11-11, Adesope asked)
 The hero's left side (pill, headline, sub, buttons) is now a dark panel with a blue circuit-board photo by Олександр К on Unsplash (photo `YV03NbTQ80M`, Unsplash License, no credit required) under a navy scrim (90% → 55% opacity), white text, light-cobalt `#9db4ff` second line, glass-style "See the rules" button. Both hero columns are the same height on desktop. The "Photo: Jason Dent / Unsplash" credit was removed from the vault photo at Adesope's request (the Unsplash License doesn't require it; credits kept here). New files `web/public/hero-circuit-{800,1400}.webp` (96 KB / 193 KB). Checks: `npm run build` OK · `vitest` 31/31 · headless Chromium 1536px and iPhone 13: text readable, no overflow, no page errors.
 
