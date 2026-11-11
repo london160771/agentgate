@@ -123,12 +123,12 @@ export default function Overview() {
                 and the contract decides what money moves.
               </p>
               <div className="d-flex flex-wrap gap-3">
-                <Link to="/judge" className="btn btn-primary btn-lg btn-icon-end d-inline-flex align-items-center gap-2">
-                  Try to break it
+                <Link to="/app" className="btn btn-primary btn-lg btn-icon-end d-inline-flex align-items-center gap-2">
+                  Create your vault
                   <Icon name="arrowRight" />
                 </Link>
-                <Link to="/agents" className="btn btn-quiet btn-lg">
-                  See the rules
+                <Link to="/judge" className="btn btn-quiet btn-lg">
+                  Try to break the demo
                 </Link>
               </div>
             </div>

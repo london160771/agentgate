@@ -6,9 +6,10 @@ import { WalletControl, WalletNotice } from './Wallet.jsx';
 
 const NAV = [
   ['/', 'Overview'],
-  ['/agents', 'Agents and rules'],
-  ['/activity', 'Activity'],
+  ['/app', 'My vaults'],
   ['/judge', 'Attack lab'],
+  ['/activity', 'Demo activity'],
+  ['/agents', 'Demo rules'],
   ['/docs', 'Docs'],
 ];
 
@@ -53,7 +54,7 @@ export default function Layout() {
         <div className="container d-flex flex-wrap gap-3 justify-content-between">
           <span className="d-inline-flex flex-wrap align-items-center gap-2">
             <span className="ag-dot" aria-hidden="true" />
-            Real transactions on NEAR testnet. Every number is read live from{' '}
+            Real transactions on NEAR testnet. The demo reads live from{' '}
             <a className="font-monospace" href={accountLink(cfg.vaultAccountId)} target="_blank" rel="noreferrer">
               {cfg.vaultAccountId}
             </a>

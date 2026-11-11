@@ -35,11 +35,13 @@ const METHODS = [
   ['revoke_agent(public_key)', 'Owner', 'Marks the agent inactive and deletes its key in the same transaction.'],
   ['approve_held(payment_id) / reject_held(payment_id)', 'Owner', 'Decides a held payment. Approval skips the caps on purpose (a human decided) but still checks the balance.'],
   ['get_stats, get_agents, get_agent, get_payments, get_held, get_owner', 'Anyone (view)', 'Read-only. This site reads everything it shows through these.'],
+  ['factory: create_vault(name)', 'Any wallet (attach NEAR)', 'Creates <name>.<factory> in one batch: create account, send the deposit, deploy the vault code, set the caller as owner. No key is added. If any step fails, the deposit goes back.'],
 ];
 
 const SECTIONS = [
   ['what', 'What AgentGate is'],
   ['who', 'Who it’s for'],
+  ['start', 'Get your own vault'],
   ['how', 'How it works'],
   ['decisions', 'Decisions and reason codes'],
   ['demo', 'The demo vault'],
@@ -126,6 +128,19 @@ export default function Docs() {
             <p className="small text-secondary mb-0">AgentGate runs on NEAR testnet today and handles NEAR only. These are the people it is built for, not existing customers.</p>
           </Section>
 
+          <Section id="start">
+            <ol className="ag-doc-steps">
+              <li>Get a NEAR testnet wallet, e.g. <Ext href="https://wallet.meteorwallet.app">Meteor Wallet</Ext>, and some testnet NEAR from the <Ext href="https://near-faucet.io">faucet</Ext>. The create form shows the exact minimum, read from the factory (about 2.7 NEAR today): about 2 NEAR pays for storing the vault code, the rest is the vault’s balance.</li>
+              <li>Open <Link to="/app">My vaults</Link>, press <strong>Connect wallet</strong>, pick a name and press <strong>Create vault</strong>. One transaction creates <Mono>{'<name>'}.{cfg.factoryAccountId}</Mono> with you as owner. The new account has no access key at all, so it is locked from birth.</li>
+              <li>On the vault page press <strong>Add an agent</strong>: set the caps and the approved recipients. Your browser makes a new key, and the vault adds it to itself as a key that can only call <code>request_spend</code>.</li>
+              <li>Copy the key and the setup snippet shown once, and give them to your agent like an API key. The site does not keep the private key.</li>
+              <li>Your agent calls <code>request_spend</code>. Each request shows up on your vault page as PAID, HELD or BLOCKED. You approve or reject held ones and can revoke the agent at any time.</li>
+            </ol>
+            <p className="mb-0 small text-secondary">
+              Each wallet sees only the vaults it created. Anyone can open any vault’s page and read it, because everything is on chain.
+            </p>
+          </Section>
+
           <Section id="how">
             <ol className="ag-doc-steps">
               <li><strong>The owner funds the vault</strong> and sets each agent’s rules: a per-payment cap, a daily cap and a list of approved recipients.</li>
@@ -195,9 +210,9 @@ export default function Docs() {
 
           <Section id="owners">
             <ol className="ag-doc-steps">
-              <li>Press <strong>Connect wallet</strong> in the navbar and pick a NEAR testnet wallet, e.g. <Ext href="https://wallet.meteorwallet.app">Meteor Wallet</Ext> (its browser extension is used when installed).</li>
-              <li>If you are the vault’s owner, <Link to="/activity">Activity</Link> shows <strong>Approve</strong> and <strong>Reject</strong> next to each held payment, and <Link to="/agents">Agents</Link> shows <strong>Revoke</strong>.</li>
+              <li>On your own vault’s page, held payments show <strong>Approve</strong> and <strong>Reject</strong>, and each agent shows <strong>Revoke</strong>. <strong>Add funds</strong> sends NEAR from your wallet to the vault.</li>
               <li>Each button opens your wallet to confirm the transaction. The site never gets a key of its own.</li>
+              <li>The demo vault’s owner gets the same buttons on <Link to="/activity">Demo activity</Link> and <Link to="/agents">Demo rules</Link>.</li>
             </ol>
             <p className="mb-0 small text-secondary">
               Anyone else who signs in sees no buttons, and the contract refuses non-owners anyway (<Mono>ERR_NOT_OWNER</Mono>).
@@ -217,6 +232,7 @@ node scripts/owner.js approve <id>  # owner: approve / reject / revoke`}</pre>
             <p>Add <code>--dry-run</code> to any script to print the plan without sending anything.</p>
             <ul className="ag-doc-list mb-0">
               <li><Ext href={file('contract/src/lib.rs')}>contract/src/lib.rs</Ext>: the vault contract (Rust, near-sdk).</li>
+              <li><Ext href={file('factory/src/lib.rs')}>factory/src/lib.rs</Ext>: the factory that creates a locked vault for each user.</li>
               <li><Ext href={file('scripts/lib/attacks.js')}>scripts/lib/attacks.js</Ext>: the 7 attacks, shared by the CLI and this site.</li>
               <li><Ext href={file('scripts/lib/classify.js')}>scripts/lib/classify.js</Ext>: turns NEAR errors into readable refusals.</li>
               <li><Ext href={file('README.md')}>README.md</Ext>: the story, test counts and on-chain proof.</li>

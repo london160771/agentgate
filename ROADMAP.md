@@ -6,6 +6,10 @@ Ideas that are **not** in the hackathon build. The hackathon build is the first 
 - ~~**P1-a** Owner actions in the UI with NEAR Wallet Selector (approve / reject / revoke).~~ Built (MyNearWallet). More wallet modules (Meteor, HOT, Intear) can be added later.
 - **P1-b** Vault lock: remove the vault's full-access key so no one, not even us, can bypass the rules. Script built (`scripts/lock-vault.js`); the lock itself is run by Adesope.
 
+## Multi-user (built after the P0 demo, at Adesope's request)
+- ~~One vault per wallet: factory, My vaults, per-vault dashboard, add agent from the browser.~~ Built; factory deploy run by Adesope.
+- Later: edit an agent's rules from the dashboard (`update_rules` exists in the contract), a vault list that also finds vaults made outside the factory, more wallets in the picker.
+
 ## Vision: Agent Passport (was P1-c)
 Only agents running approved code inside a TEE (NEAR Shade Agents attestation, e.g. on Phala Cloud) can be given a key. A copied key or a modified agent gets nothing, and users can check which agent code handles their money. This closes the last gap of the hackathon build: today a leaked key can still spend inside its caps.
 

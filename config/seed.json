@@ -2,6 +2,7 @@
   "network": "testnet",
   "ownerAccountId": "agentgate-ayo.testnet",
   "vaultAccountId": "vault.<owner>.testnet",
+  "factoryAccountId": "agentgate.testnet",
   "recipients": {
     "apiProvider": "api-provider.<owner>.testnet",
     "dataProvider": "data-provider.<owner>.testnet",

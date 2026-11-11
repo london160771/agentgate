@@ -29,7 +29,16 @@ async function withFallback(what, read) {
   throw new Error(`All RPCs failed for ${what}:\n${errors.join('\n')}`);
 }
 
-/** View call on the vault, trying each RPC until one answers. */
+/** View call on any contract (a user's vault, the factory), trying each RPC until one answers. */
+export const viewAt = (accountId, method, args = {}) => withFallback(method, (p) => view(p, accountId, method, args));
+
+/** View call on the vault factory (multi-user: one vault per user). */
+export const viewFactory = (method, args = {}) => viewAt(cfg.factoryAccountId, method, args);
+
+/** Any account's access-key list (lock status: locked = no full-access key). */
+export const accessKeysOf = (accountId) => withFallback('access keys', (p) => new Account(accountId, p).getAccessKeyList());
+
+/** View call on the demo vault, trying each RPC until one answers. */
 export const viewVault = (method, args = {}) => withFallback(method, (p) => view(p, cfg.vaultAccountId, method, args));
 
 /** The vault account's access-key list (to show the minted key and the lock status). */

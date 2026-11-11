@@ -24,6 +24,7 @@ export function resolveConfig(raw) {
   const owner = cfg.ownerAccountId;
   const fill = (id) => (isPlaceholder(owner) ? id : String(id).replace(`<owner>.${cfg.network}`, owner));
   cfg.vaultAccountId = fill(cfg.vaultAccountId);
+  if (cfg.factoryAccountId) cfg.factoryAccountId = fill(cfg.factoryAccountId);
   cfg.recipients = Object.fromEntries(Object.entries(cfg.recipients || {}).map(([k, v]) => [k, fill(v)]));
   return cfg;
 }
@@ -91,6 +92,12 @@ export function validateConfig(raw, stage = 'template') {
       need(isAccountId(raw.ownerAccountId), `ownerAccountId "${raw.ownerAccountId}" is not a valid account id`);
       need(raw.ownerAccountId.endsWith('.testnet'), 'ownerAccountId must end with .testnet');
       const cfg = resolveConfig(raw);
+      // The factory is its own top-level account (vaults are <name>.<factory>), so it is
+      // not a sub-account of the owner; it only has to be a valid testnet id.
+      if (cfg.factoryAccountId) {
+        need(isAccountId(cfg.factoryAccountId), `factoryAccountId "${cfg.factoryAccountId}" is not a valid account id`);
+        need(cfg.factoryAccountId.endsWith('.testnet'), 'factoryAccountId must end with .testnet');
+      }
       for (const [name, id] of [['vaultAccountId', cfg.vaultAccountId], ...Object.entries(cfg.recipients || {})]) {
         need(isAccountId(id), `${name} "${id}" is not a valid account id`);
         need(String(id).endsWith(`.${raw.ownerAccountId}`), `${name} "${id}" must be a sub-account of the owner`);

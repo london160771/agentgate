@@ -8,6 +8,7 @@ import { actionCreators, setupWalletSelector } from '@near-wallet-selector/core'
 import { setupMeteorWallet } from '@near-wallet-selector/meteor-wallet';
 import { cfg, RPC_URLS } from './near.js';
 import { ownerAction } from './owner.js';
+import { createVaultAction } from './factory.js';
 
 // The wallet modules use Node's Buffer as a global.
 globalThis.Buffer ??= Buffer;
@@ -44,12 +45,22 @@ export async function signOut() {
   if (selector.isSignedIn()) await (await selector.wallet()).signOut();
 }
 
-/** Signs one owner call in the wallet popup. Resolves with the FinalExecutionOutcome. */
-export async function sendOwnerAction(signerId, method, args) {
+/** Signs one owner call in the wallet. Resolves with the FinalExecutionOutcome. */
+export async function sendOwnerAction(signerId, method, args, vaultId = cfg.vaultAccountId) {
+  return sendTx(signerId, vaultId, [ownerAction(actionCreators.functionCall, method, args)]);
+}
+
+/** Creates `<name>.<factory>` owned by the signer. `depositYocto` funds the new vault. */
+export async function sendCreateVault(signerId, name, depositYocto) {
+  return sendTx(signerId, cfg.factoryAccountId, [createVaultAction(actionCreators.functionCall, name, depositYocto)]);
+}
+
+/** Sends NEAR from the signed-in wallet to a vault (anyone can top up a vault). */
+export async function sendFund(signerId, vaultId, amountYocto) {
+  return sendTx(signerId, vaultId, [actionCreators.transfer(BigInt(amountYocto))]);
+}
+
+async function sendTx(signerId, receiverId, actions) {
   const wallet = await (await getSelector()).wallet();
-  return wallet.signAndSendTransaction({
-    signerId,
-    receiverId: cfg.vaultAccountId,
-    actions: [ownerAction(actionCreators.functionCall, method, args)],
-  });
+  return wallet.signAndSendTransaction({ signerId, receiverId, actions });
 }

@@ -1,5 +1,6 @@
 // Owner sign-in state shared by every page, plus the owner action button (P1-a).
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { txLink } from '../lib/links.js';
 import { viewVault } from '../lib/near.js';
 import { isOwner, outcomeFailure, outcomeHash } from '../lib/owner.js';
@@ -39,6 +40,8 @@ export function WalletProvider({ children }) {
     error,
     isOwner: isOwner(accountId, owner),
     choices: () => loadWallet().then((m) => m.walletChoices()),
+    /** The wallet module (sendCreateVault, sendFund, sendOwnerAction), loaded on demand. */
+    load: loadWallet,
     signIn: (walletId) => loadWallet().then((m) => m.signIn(walletId)).catch((e) => setError(e)),
     signOut: () => loadWallet().then((m) => m.signOut()).catch((e) => setError(e)),
   };
@@ -86,7 +89,7 @@ function WalletPicker() {
               </span>
             </button>
           ))}
-          <div className="ag-label px-2 pt-2">Only the vault owner gets approve, reject and revoke buttons.</div>
+          <div className="ag-label px-2 pt-2">Sign in to create your own vault and manage its agents.</div>
         </div>
       )}
     </div>
@@ -99,7 +102,6 @@ export function WalletControl() {
   if (!w.accountId) return <WalletPicker />;
   return (
     <div className="d-flex align-items-center gap-2 small">
-      <span className={`ag-stamp ag-stamp--${w.isOwner ? 'paid' : 'neutral'}`}>{w.isOwner ? 'owner' : 'not the owner'}</span>
       <span className="text-truncate font-monospace text-secondary" style={{ maxWidth: '14rem' }}>
         {w.accountId}
       </span>
@@ -113,28 +115,31 @@ export function WalletControl() {
 /** Banner under the navbar: wallet errors, or a note when a non-owner is signed in. */
 export function WalletNotice() {
   const w = useWallet();
+  const { pathname } = useLocation();
   if (w.error) return <div className="ag-panel ag-panel-pad mt-4 small">Wallet: {String(w.error?.message || w.error)}</div>;
-  if (w.accountId && w.owner && !w.isOwner)
+  // Only on the demo vault's pages; a user's own vault has its own dashboard.
+  if (w.accountId && w.owner && !w.isOwner && ['/activity', '/agents'].includes(pathname))
     return (
       <div className="ag-panel ag-panel-pad mt-4 small text-secondary">
-        Signed in as <Mono>{w.accountId}</Mono>. Only the vault owner (<Mono>{w.owner}</Mono>) can approve, reject or revoke, so no owner
-        buttons are shown.
+        This is the public demo vault. Only its owner (<Mono>{w.owner}</Mono>) can approve, reject or revoke here. Your own vaults are in{' '}
+        <Link to="/app">My vaults</Link>.
       </div>
     );
   return null;
 }
 
 /** One owner action. Opens the wallet to confirm, then shows the tx link or the error. */
-export function OwnerButton({ method, args, label, variant = 'quiet', onDone }) {
+// Pass `vaultId` and `isOwner` for a user's own vault; without them it acts on the demo vault.
+export function OwnerButton({ method, args, label, variant = 'quiet', onDone, vaultId, isOwner }) {
   const w = useWallet();
   const [state, setState] = useState({ busy: false, hash: '', error: '' });
-  if (!w.isOwner) return null;
+  if (!(isOwner ?? w.isOwner)) return null;
 
   async function run() {
     setState({ busy: true, hash: '', error: '' });
     try {
       const { sendOwnerAction } = await loadWallet();
-      const outcome = await sendOwnerAction(w.accountId, method, args);
+      const outcome = await sendOwnerAction(w.accountId, method, args, vaultId);
       const failure = outcomeFailure(outcome);
       setState({ busy: false, hash: outcomeHash(outcome), error: failure || '' });
       onDone?.();

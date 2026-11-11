@@ -2,7 +2,7 @@
 import { GAS_OWNER } from '../../../scripts/lib/chain.js';
 
 /** The only vault methods the web app lets the owner call. */
-export const OWNER_METHODS = ['approve_held', 'reject_held', 'revoke_agent'];
+export const OWNER_METHODS = ['approve_held', 'reject_held', 'revoke_agent', 'add_agent'];
 
 /** One FunctionCall action, no deposit (owner methods are not payable). `fc` = actionCreators.functionCall. */
 export function ownerAction(fc, method, args) {

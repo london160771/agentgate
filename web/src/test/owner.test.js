@@ -12,9 +12,9 @@ describe('ownerAction', () => {
     expect(a.functionCall.deposit).toBe(0n);
     expect(a.functionCall.gas).toBe(GAS_OWNER);
   });
-  it('only allows the three owner methods', () => {
-    expect(OWNER_METHODS).toEqual(['approve_held', 'reject_held', 'revoke_agent']);
-    for (const m of ['request_spend', 'update_rules', 'add_agent']) expect(() => ownerAction(actionCreators.functionCall, m, {})).toThrow(/not an owner action/);
+  it('only allows the owner methods the web app uses', () => {
+    expect(OWNER_METHODS).toEqual(['approve_held', 'reject_held', 'revoke_agent', 'add_agent']);
+    for (const m of ['request_spend', 'update_rules', 'new']) expect(() => ownerAction(actionCreators.functionCall, m, {})).toThrow(/not an owner action/);
   });
 });
 
