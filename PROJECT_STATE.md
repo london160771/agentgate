@@ -39,6 +39,10 @@ P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
 
 ## Log
 
+### Web: /docs page + navbar link (2026-11-11, Adesope asked: "we need a docs page and must be added to the navbar too")
+New `web/src/pages/Docs.jsx` at `/docs`, linked as **Docs** in the sticky navbar. Sticky "On this page" sidebar on desktop (wrapped link list on phones) and sections: what it is, who it's for, how it works + guarantee, decisions and reason codes (PRD 6.3 table + REFUSED_BY_NEAR refusals), the demo vault (caps, allowance, recipients, hold-queue limit all read from `config/seed.json` at build time), guides for judges / owners / developers (CLI), contract methods (PRD 6.2), security model and limits, where it's going (ROADMAP). Static content, no chain calls. Styles added at the end of `web/src/theme.css` (`ag-doc-*`). Files: `web/src/pages/Docs.jsx`, `web/src/main.jsx`, `web/src/components/Layout.jsx`, `web/src/theme.css`.
+**Checks**: `npm run build` OK · `vitest` 31/31 (the no-hardcoded-numbers check now covers Docs.jsx too) · headless Chromium 1440px and iPhone 13: Docs nav item active, no horizontal overflow, no page errors, `#decisions` link scrolls below the sticky nav, sidebar stays at top 96px.
+
 ### README: who it's for + long-term vision (2026-11-11, Adesope asked)
 Added `## Who it's for` (after The insight: developers with paying agents, teams behind public agents, DAOs / small treasuries, apps running agents for users, security people / judges; with a line that these are target users, not customers) and `## Where it's going` (before Built at: today Agent Firewall → mainnet + stablecoin budgets → Swarm Guard → Intents / Chain Signatures → Agent Passport vision), all taken from PRD §4 and ROADMAP.md. No new numbers. Docs only, no code change.
 

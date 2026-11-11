@@ -7,6 +7,7 @@ import Layout from './components/Layout.jsx';
 import { WalletProvider } from './components/Wallet.jsx';
 import Activity from './pages/Activity.jsx';
 import Agents from './pages/Agents.jsx';
+import Docs from './pages/Docs.jsx';
 import Judge from './pages/Judge.jsx';
 import Overview from './pages/Overview.jsx';
 
@@ -24,6 +25,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="agents" element={<Agents />} />
             <Route path="activity" element={<Activity />} />
             <Route path="judge" element={<Judge />} />
+            <Route path="docs" element={<Docs />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

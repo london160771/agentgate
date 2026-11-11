@@ -9,6 +9,7 @@ const NAV = [
   ['/agents', 'Agents and rules'],
   ['/activity', 'Activity'],
   ['/judge', 'Attack lab'],
+  ['/docs', 'Docs'],
 ];
 
 export default function Layout() {
