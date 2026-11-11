@@ -1,0 +1,16 @@
+{
+  "name": "agentgate-scripts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "AgentGate deploy, seed, Gate 0, attack suite, owner and demo agent scripts",
+  "license": "MIT",
+  "engines": { "node": ">=22.22.2" },
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "near-api-js": "^7.5.2"
+  }
+}
