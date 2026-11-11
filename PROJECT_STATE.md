@@ -23,7 +23,7 @@ P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
 | 2. Scripts + classifier | done | 7bdf80c | `node --test` 46/46 pass · 12 dry-runs exit 0 |
 | ⛔ A. Gate 0 (Adesope) | **done: PASS** | ef878ce + evidence commit | Gate 0 4/4 PASS · Attack Suite 7/7 as expected · `node --test` 48/48 |
 | 3. Web + Attack Lab | done | 55ce9ee | `npm run build` OK · `vitest` 21/21 · no hardcoded seed numbers |
-| 4. README + proof docs | done | see Phase 4 log | numbers checked against `config/seed.json` + `evidence/`; tests re-run 33 / 48 / 21 pass |
+| 4. README + proof docs | done | 7617c37 | numbers checked against `config/seed.json` + `evidence/`; tests re-run 33 / 48 / 21 pass |
 | ⛔ B. Launch (Adesope) | **active** | | checklist at the top |
 
 ## Known facts
