@@ -26,7 +26,7 @@ P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
 | 3. Web + Attack Lab | done | 55ce9ee | `npm run build` OK · `vitest` 21/21 · no hardcoded seed numbers |
 | 4. README + proof docs | done | 7617c37 | numbers checked against `config/seed.json` + `evidence/`; tests re-run 33 / 48 / 21 pass |
 | ⛔ B. Launch (Adesope) | **active** | | checklist at the top |
-| P1-a. Owner actions in UI | done | see P1-a log | `vitest` 29/29 · build OK · wallet flow checked up to the MyNearWallet sign page |
+| P1-a. Owner actions in UI | done | 549a60d | `vitest` 29/29 · build OK · wallet flow checked up to the MyNearWallet sign page |
 
 ## Known facts
 - Network: testnet only (HACKATHON.md Q-010, Q-008).
