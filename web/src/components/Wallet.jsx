@@ -6,7 +6,11 @@ import { isOwner, outcomeFailure, outcomeHash } from '../lib/owner.js';
 import { Mono } from './ui.jsx';
 
 // The wallet code is large, so it loads in its own chunk after the page renders.
-const loadWallet = () => import('../lib/wallet.js');
+// The Meteor wallet SDK reads Node's `global` when its module loads, so set it first.
+const loadWallet = () => {
+  globalThis.global ??= globalThis;
+  return import('../lib/wallet.js');
+};
 
 const WalletContext = createContext(null);
 export const useWallet = () => useContext(WalletContext);

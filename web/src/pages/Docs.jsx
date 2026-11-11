@@ -195,7 +195,7 @@ export default function Docs() {
 
           <Section id="owners">
             <ol className="ag-doc-steps">
-              <li>Press <strong>Owner sign in</strong> in the navbar and sign in with MyNearWallet (testnet).</li>
+              <li>Press <strong>Owner sign in</strong> in the navbar and sign in with <Ext href="https://wallet.meteorwallet.app">Meteor Wallet</Ext> (testnet).</li>
               <li>If you are the vault’s owner, <Link to="/activity">Activity</Link> shows <strong>Approve</strong> and <strong>Reject</strong> next to each held payment, and <Link to="/agents">Agents</Link> shows <strong>Revoke</strong>.</li>
               <li>Each button opens your wallet to confirm the transaction. The site never gets a key of its own.</li>
             </ol>

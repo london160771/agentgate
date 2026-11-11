@@ -12,7 +12,7 @@ P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
 5. **Fill the TODO links** in `README.md` (search `TODO(Adesope)`: Vercel URL ×2, video URL, X post URL). Send them to the agent or edit them yourself.
 6. **Create the mainnet payout account** for the prize.
 6a. ~~**P1-b vault lock**~~ **DONE** 2026-11-11 18:17 UTC (tx `8mo1vVL7…`, `evidence/lock-2026-11-11T18-17-59Z.json`). Old instructions:, best after steps 1–2 so you know the contract needs no more changes: `cd ~/agentgate && git pull`, then `node scripts/lock-vault.js` (checks only, sends nothing), then `node scripts/lock-vault.js --confirm`. Attach the new `evidence/lock-<time>.json` in chat; the agent then updates README / REAL_VS_MOCKED with the proof.
-6b. **P1-a live check (owner buttons)**: put your owner account into MyNearWallet testnet with `near account export-account agentgate-ayo.testnet using-web-wallet network-config testnet` (it opens or prints a testnet.mynearwallet.com import link; open it in your browser). Then on the site press **Owner sign in**, allow pop-ups, go to `/activity` and press **Reject** on held payment #3 (or do it on camera for the video). The wallet pop-up shows the tx; confirm it. The row should disappear and a tx link appear.
+6b. **P1-a live check (owner buttons)**: MyNearWallet no longer accepts app connections (Nov 2026), so the site now uses **Meteor Wallet**. Put your owner account into Meteor on testnet: open https://wallet.meteorwallet.app, switch the network to **Testnet**, choose **Import account → private key**, and paste the `private_key` from `~/.near-credentials/testnet/agentgate-ayo.testnet.json` (shown by `cat ~/.near-credentials/testnet/agentgate-ayo.testnet.json`; never paste it in chat). Then on the site press **Owner sign in**, allow pop-ups, go to `/activity` and press **Reject** on held payment #3 (or do it on camera for the video). The wallet pop-up shows the tx; confirm it. The row should disappear and a tx link appear.
 7. **Submit the form before 16:00 UTC on 14 Nov 2026.**
 
 ## Current phase
@@ -28,7 +28,7 @@ P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
 | 4. README + proof docs | done | 7617c37 | numbers checked against `config/seed.json` + `evidence/`; tests re-run 33 / 48 / 21 pass |
 | ⛔ B. Launch (Adesope) | **active** | | checklist at the top |
 | P1-b. Vault lock | done: script 638903e, lock run by Adesope 2026-11-11 18:17 UTC | 638903e | `node --test` 53/53 · dry run OK · live pre-check refuses a wrong key |
-| P1-a. Owner actions in UI | done | 549a60d | `vitest` 29/29 · build OK · wallet flow checked up to the MyNearWallet sign page |
+| P1-a. Owner actions in UI | done (wallet now Meteor) | 549a60d | `vitest` 29/29 · build OK · wallet flow checked up to the MyNearWallet sign page; Meteor login pop-up checked |
 
 ## Known facts
 - Network: testnet only (HACKATHON.md Q-010, Q-008).
@@ -38,6 +38,10 @@ P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
 - near-sdk 5.30.1 refuses a plain native `cargo clippy` (it emits a compile_error telling you to use cargo-near). Working lint commands: `cargo clippy --all-targets -- -D warnings` (native, includes tests) and `cargo clippy --target wasm32-unknown-unknown -- -D warnings`.
 
 ## Log
+
+### Web: owner sign-in moved from MyNearWallet to Meteor Wallet (2026-11-11)
+Adesope's screenshot: MyNearWallet now says "MyNearWallet can't connect to apps anymore… being retired… move your account to Meteor Wallet". Changes: `@near-wallet-selector/my-near-wallet` removed, `@near-wallet-selector/meteor-wallet@10.1.4` added (same wallet-selector version as core; needed for the P1-a owner buttons). Meteor's SDK needs near-api-js 6 (nested copy) and reads Node's `global`, so: `vite.config.js` no longer dedupes near-api-js globally; a small resolve plugin points only `scripts/**` imports of near-api-js at `web/node_modules` (7.x), and `Wallet.jsx` sets `globalThis.global` before lazy-loading the wallet. Sign-in still requests no contract key; every owner action is confirmed in the Meteor pop-up. Docs page and README now say Meteor Wallet; PROJECT_STATE step 6b updated with Meteor import steps. Files: `web/package.json`, `web/package-lock.json`, `web/vite.config.js`, `web/src/lib/wallet.js`, `web/src/components/Wallet.jsx`, `web/src/pages/Docs.jsx`, `README.md`, `REAL_VS_MOCKED.md`, `PROJECT_STATE.md`.
+**Checks**: `npm run build` OK, also with `scripts/node_modules` removed (as on Vercel) · `vitest` 31/31 · headless Chromium: home page reads live data; **Owner sign in** opens `https://wallet.meteorwallet.app/connect/testnet/login?...` in a pop-up; no page errors. A confirmed web-signed owner tx still needs Adesope (step 6b).
 
 ### Web: shorter hero for laptops (2026-11-11, Adesope: "hero section is too tall on laptop")
 Vault card compacted: counts on one line next to their stamps, one short totals line, 1 latest decision (was 2); vault photo strip 260px → 170px (150px on phones); left panel and hero padding reduced. Hero height at 1536×730 is about 610px (was about 895px), so it fits a laptop screen. Files: `web/src/pages/Overview.jsx`, `web/src/theme.css`. Checks: `npm run build` OK · `vitest` 31/31 · headless Chromium 1536px and iPhone 13: no overflow, no page errors.
