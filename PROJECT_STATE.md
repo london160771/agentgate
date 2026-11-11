@@ -39,6 +39,9 @@ P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
 
 ## Log
 
+### README: who it's for + long-term vision (2026-11-11, Adesope asked)
+Added `## Who it's for` (after The insight: developers with paying agents, teams behind public agents, DAOs / small treasuries, apps running agents for users, security people / judges; with a line that these are target users, not customers) and `## Where it's going` (before Built at: today Agent Firewall → mainnet + stablecoin budgets → Swarm Guard → Intents / Chain Signatures → Agent Passport vision), all taken from PRD §4 and ROADMAP.md. No new numbers. Docs only, no code change.
+
 ### P1-b: vault locked on testnet (2026-11-11 18:17 UTC, run by Adesope)
 Adesope ran `node scripts/lock-vault.js --confirm` and attached `evidence/lock-2026-11-11T18-17-59Z.json` (result LOCKED, tx `8mo1vVL7ZKyTHdGWSJVwjLviEMxsgKV13mJUP1M6WPzV`, deleted `ed25519:3zfLDHfU…`).
 **Checked from the cloud** (testnet RPC): `view_access_key_list` on the vault at block 277251453 returns 1 key, `ed25519:z28Hcnsj…` FunctionCall; `tx` status for the lock tx = `SuccessValue`.

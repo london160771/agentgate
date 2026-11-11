@@ -26,6 +26,20 @@ You can't stop an agent from being tricked. You can't promise its key will never
 
 **But you can make sure a tricked agent, or a leaked key, can't steal.**
 
+## Who it's for
+
+Anyone who wants an AI agent to spend money without handing it the wallet.
+
+| Who | What they want the agent to do | Why AgentGate matters to them |
+|---|---|---|
+| **Developers building paying agents** | Buy API calls, data, compute or services on their own | Give the agent a budget, not the wallet. If the agent is tricked or its key leaks, the loss is capped at the rules they set. |
+| **Teams behind public agents** (like Freysa or AIXBT) | Hold a prize pool or treasury and react to strangers' messages | Anyone can talk to these agents, so someone eventually talks them into something. The vault still refuses any payment that breaks the rules. |
+| **DAOs and small treasuries** | Pay approved suppliers or contributors automatically | Payments to known recipients go through; anything new waits for a human to approve. Every decision is logged on chain. |
+| **Apps that run agents for their users** | Let a user's assistant shop or pay bills | Each user's agent gets its own limited key and caps, and the app or user can revoke it in one transaction. |
+| **Security people and judges** | Check that the claims are true | The demo key is public. Anyone can try to drain the vault on [`/judge`](https://agentgate-near.vercel.app/judge) and see every attack refused on chain. |
+
+Today AgentGate runs on NEAR testnet and handles NEAR only. The rows above describe who it is built for, not existing customers.
+
 ## How it works
 
 ```
@@ -132,6 +146,18 @@ Gate 0, the Attack Suite and the dashboard numbers are real NEAR testnet results
 - Someone with the leaked key can **use up the daily cap**, but only by paying approved recipients. The money can't reach them.
 - The held queue can be filled with junk requests (max 20). New unknown-recipient requests are then blocked until the owner clears it.
 - AgentGate doesn't stop prompt injection. It limits what an injected agent can do.
+
+## Where it's going
+
+**Long-term goal: any AI agent can hold a budget safely, and anyone can check the rules it spends under.** The model may be fooled, but the money follows rules that the chain enforces.
+
+1. **Today (this hackathon): Agent Firewall.** One vault, contract-minted keys, per-payment and daily caps, an approved-recipient list, a human approval queue, and a locked vault. Live on testnet.
+2. **Next: mainnet and real budgets.** A contract review, then mainnet. Stablecoin budgets (NEP-141, e.g. USDC on NEAR), per-recipient caps and rate limits, and a public "drain me" vault with the key posted.
+3. **Then: one budget for many agents (Swarm Guard).** A team runs many agents from one shared budget, and each agent gets its own sub-limit.
+4. **Then: spend anywhere under the same rules.** Payments through NEAR Intents and Chain Signatures, so an agent can pay on other chains while the vault on NEAR still decides.
+5. **Vision: Agent Passport.** Only agents running approved code inside a TEE (NEAR Shade Agents) can be given a key. A copied key or a modified agent gets nothing, and users can check which agent code handles their money. This closes the last gap in today's build: a leaked key can still spend inside its caps.
+
+Details and status: [ROADMAP.md](ROADMAP.md).
 
 ## Built at NEAR HACKATHON
 All code in this repo was written during the hackathon window (1–14 Nov 2026). Tracks: AI Security & Defense, Agent Economy. AgentGate is the first slice, the Agent Firewall, of a bigger plan for AI-agent security. See [ROADMAP.md](ROADMAP.md).
