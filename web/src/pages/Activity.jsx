@@ -1,11 +1,17 @@
 import { formatNear } from '../../../scripts/lib/format.js';
 import { ChainView, Mono, StatusChip } from '../components/ui.jsx';
+import { OwnerButton, useWallet } from '../components/Wallet.jsx';
 import { accountLink, nsToDate } from '../lib/links.js';
 import { cfg, viewVault } from '../lib/near.js';
 import { useChain } from '../lib/useChain.js';
 
-function HeldQueue() {
+function HeldQueue({ onChange }) {
   const held = useChain(() => viewVault('get_held'));
+  const { isOwner } = useWallet();
+  const done = () => {
+    held.reload();
+    onChange();
+  };
   return (
     <section className="mb-4">
       <div className="d-flex justify-content-between align-items-center">
@@ -15,7 +21,8 @@ function HeldQueue() {
         </button>
       </div>
       <p className="small text-secondary">
-        Payments to unknown recipients wait here. They use no budget. Owner actions are CLI only in this MVP, run from the repo root.
+        Payments to unknown recipients wait here. They use no budget. The owner approves or rejects them: sign in as the owner to get
+        buttons (each one opens the wallet to confirm), or use the CLI from the repo root.
       </p>
       <ChainView state={held} what="Reading the held queue">
         {(list) =>
@@ -32,6 +39,12 @@ function HeldQueue() {
                     <span className="small text-secondary">{nsToDate(p.at)}</span>
                   </div>
                   <div className="small mt-1">“{p.reason}”</div>
+                  {isOwner && (
+                    <div className="d-flex flex-wrap gap-3 mt-2">
+                      <OwnerButton method="approve_held" args={{ payment_id: p.id }} label={`Approve: pay ${formatNear(p.amount)}`} variant="success" onDone={done} />
+                      <OwnerButton method="reject_held" args={{ payment_id: p.id }} label="Reject" variant="outline-danger" onDone={done} />
+                    </div>
+                  )}
                   <Mono className="d-block small bg-light rounded p-2 mt-2">
                     node scripts/owner.js approve {p.id}
                     <br />
@@ -47,9 +60,8 @@ function HeldQueue() {
   );
 }
 
-function PaymentLog() {
+function PaymentLog({ log }) {
   // get_payments returns the kept log (last logMax entries) oldest first; show newest first.
-  const log = useChain(() => viewVault('get_payments', { from_index: 0, limit: cfg.logMax }).then((l) => [...l].reverse()));
   return (
     <section>
       <div className="d-flex justify-content-between align-items-center">
@@ -115,11 +127,12 @@ function PaymentLog() {
 }
 
 export default function Activity() {
+  const log = useChain(() => viewVault('get_payments', { from_index: 0, limit: cfg.logMax }).then((l) => [...l].reverse()));
   return (
     <>
       <h1 className="h3">Activity</h1>
-      <HeldQueue />
-      <PaymentLog />
+      <HeldQueue onChange={log.reload} />
+      <PaymentLog log={log} />
     </>
   );
 }

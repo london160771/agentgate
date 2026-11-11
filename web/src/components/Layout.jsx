@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { cfg, configProblems, isReady } from '../lib/near.js';
 import { accountLink } from '../lib/links.js';
+import { WalletControl, WalletNotice } from './Wallet.jsx';
 
 const NAV = [
   ['/', 'Overview'],
@@ -32,6 +33,9 @@ export default function Layout() {
               </li>
             ))}
           </ul>
+          <div className="ms-md-auto py-1">
+            <WalletControl />
+          </div>
         </div>
       </nav>
       <main className="container py-4">
@@ -45,6 +49,7 @@ export default function Layout() {
             </ul>
           </div>
         )}
+        <WalletNotice />
         <Outlet />
       </main>
       <footer className="container pb-4 small text-secondary">

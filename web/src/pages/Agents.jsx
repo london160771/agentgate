@@ -1,5 +1,6 @@
 import { formatNear } from '../../../scripts/lib/format.js';
 import { CapMeter, ChainView, Mono, StatusChip } from '../components/ui.jsx';
+import { OwnerButton } from '../components/Wallet.jsx';
 import { accessKeysLink } from '../lib/links.js';
 import { cfg, viewVault } from '../lib/near.js';
 import { useChain } from '../lib/useChain.js';
@@ -53,6 +54,11 @@ export default function Agents() {
                       </dd>
                     </dl>
                     <CapMeter paidToday={a.paid_today} dailyCap={a.daily_cap} label="Paid today (UTC)" />
+                    {a.active && (
+                      <div className="mt-3">
+                        <OwnerButton method="revoke_agent" args={{ public_key: a.public_key }} label="Revoke this agent" variant="outline-danger" onDone={agents.reload} />
+                      </div>
+                    )}
                     {!a.active && <div className="small text-secondary mt-2">Revoked: the vault deleted this key, so NEAR refuses anything it signs.</div>}
                   </div>
                 </div>

@@ -11,10 +11,11 @@ P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
 4. **Post on X**: tag @NEARProtocol, #NEARHackathon, attach the video.
 5. **Fill the TODO links** in `README.md` (search `TODO(Adesope)`: Vercel URL ×2, video URL, X post URL). Send them to the agent or edit them yourself.
 6. **Create the mainnet payout account** for the prize.
+6b. **P1-a live check (owner buttons)**: put your owner account into MyNearWallet testnet with `near account export-account agentgate-ayo.testnet using-web-wallet network-config testnet` (it opens or prints a testnet.mynearwallet.com import link; open it in your browser). Then on the site press **Owner sign in**, allow pop-ups, go to `/activity` and press **Reject** on held payment #3 (or do it on camera for the video). The wallet pop-up shows the tx; confirm it. The row should disappear and a tx link appear.
 7. **Submit the form before 16:00 UTC on 14 Nov 2026.**
 
 ## Current phase
-**⛔ Manual Stop B: launch (Adesope)**. Phases 1–4 are done; the checklist is above. P1 starts only when Adesope says "go P1".
+**⛔ Manual Stop B: launch (Adesope)**. Phases 1–4 are done; the checklist is above. Adesope said "go p1a" (2026-11-11 15:02 UTC): **P1-a done** (owner buttons). P1-b and P1-c not started.
 
 ## Phase status
 | Phase | Status | Commit | Checks |
@@ -25,6 +26,7 @@ P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
 | 3. Web + Attack Lab | done | 55ce9ee | `npm run build` OK · `vitest` 21/21 · no hardcoded seed numbers |
 | 4. README + proof docs | done | 7617c37 | numbers checked against `config/seed.json` + `evidence/`; tests re-run 33 / 48 / 21 pass |
 | ⛔ B. Launch (Adesope) | **active** | | checklist at the top |
+| P1-a. Owner actions in UI | done | see P1-a log | `vitest` 29/29 · build OK · wallet flow checked up to the MyNearWallet sign page |
 
 ## Known facts
 - Network: testnet only (HACKATHON.md Q-010, Q-008).
@@ -34,6 +36,23 @@ P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
 - near-sdk 5.30.1 refuses a plain native `cargo clippy` (it emits a compile_error telling you to use cargo-near). Working lint commands: `cargo clippy --all-targets -- -D warnings` (native, includes tests) and `cargo clippy --target wasm32-unknown-unknown -- -D warnings`.
 
 ## Log
+
+### P1-a: Owner actions in the web app (2026-11-11, after "go p1a")
+**Built**
+- NEAR Wallet Selector 10.1.4 with the MyNearWallet module (testnet). **Owner sign in** in the navbar; the app reads `get_owner` and shows `owner` / `not the owner` next to the signed-in account.
+- Sign-in asks for **no function-call key**, so every owner action opens the wallet pop-up to be confirmed (approving a held payment moves real money; a key stored in the browser could do that silently).
+- `/activity`: **Approve: pay X NEAR** and **Reject** on each held payment. `/agents`: **Revoke this agent** on active agents. Buttons only render for the owner; each shows the tx link or the error (contract panics such as `ERR_NOT_OWNER` are read from the outcome). The CLI commands stay next to each held item.
+- `lib/owner.js` (pure: allowed methods `approve_held` / `reject_held` / `revoke_agent`, 0 deposit, `GAS_OWNER` from `scripts/lib/chain.js`, outcome failure/hash parsing), `lib/wallet.js` (selector setup, sign in/out, `sendOwnerAction`), `components/Wallet.jsx` (provider, navbar control, notice, `OwnerButton`). The wallet code is a separate lazy chunk, so the first page load is unchanged (main JS 499 kB; wallet chunk 579 kB).
+
+**Dependencies added (web)**: `@near-wallet-selector/core@10.1.4`, `@near-wallet-selector/my-near-wallet@10.1.4` (named in PRD P1-a), `buffer@6.0.3` (the wallet modules use Node's `Buffer` global; set in `lib/wallet.js`). `npm audit`: 10 low-severity advisories, all `elliptic` via the `@near-js/*` 2.x packages the wallet selector depends on; no fix without a breaking wallet-selector change.
+
+**Files**: `web/package.json`, `web/package-lock.json`, `web/src/main.jsx`, `web/src/components/{Layout,Wallet}.jsx`, `web/src/lib/{owner,wallet}.js`, `web/src/pages/{Activity,Agents}.jsx`, `web/src/test/owner.test.js`, `README.md`, `REAL_VS_MOCKED.md`, `ROADMAP.md`, `PROJECT_STATE.md`.
+
+**Checks (real output)**
+- `cd web && npx vitest run` → `Test Files 5 passed · Tests 29 passed` (8 new in `owner.test.js`, outcomes there are mocks).
+- `cd web && npm run build` → OK.
+- Headless Chromium against `vite preview` (no keys used): signed out → no owner buttons; **Owner sign in** opens `https://testnet.mynearwallet.com/login/` with no `contract_id` (no key requested). With a MyNearWallet session for `agentgate-ayo.testnet` placed in localStorage: navbar shows `owner`, `/activity` shows Approve + Reject for held #3, `/agents` shows Revoke on api-buyer only. Pressing Approve opened `https://testnet.mynearwallet.com/sign`; the 194-byte borsh tx contains signer `agentgate-ayo.testnet`, receiver `vault.agentgate-ayo.testnet`, `approve_held`, `payment_id`. Closing the pop-up shows "User closed the window". As `someone-else.testnet`: no buttons and a "not the owner" notice. No page errors.
+- Not checked here: a real signed owner tx from the web (needs the owner key in a wallet). That is step 6b of Manual Stop B.
 
 ### Phase 4: README story + proof docs (2026-11-11)
 **Built**

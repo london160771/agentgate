@@ -3,7 +3,7 @@
 Ideas that are **not** in the hackathon build. The hackathon build is the first slice of AgentGate: the **Agent Firewall**.
 
 ## P1 (only after the P0 demo is recorded and Adesope says "go P1")
-- **P1-a** Owner actions in the UI with NEAR Wallet Selector (approve / reject / revoke). Today they are CLI only (`scripts/owner.js`).
+- ~~**P1-a** Owner actions in the UI with NEAR Wallet Selector (approve / reject / revoke).~~ Built (MyNearWallet). More wallet modules (Meteor, HOT, Intear) can be added later.
 - **P1-b** Vault lock: remove the vault's full-access key so no one, not even us, can bypass the rules. The README shows it on the explorer.
 - **P1-c** Agent Passport experiment (3-hour time box): only agents running approved code inside a TEE (NEAR Shade Agents attestation) can be given a key.
 
