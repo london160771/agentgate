@@ -23,7 +23,7 @@ function LockLine() {
 function Count({ label, value, kind, note }) {
   return (
     <div className="col-4">
-      <div className="ag-figure" style={{ fontSize: 24 }}>
+      <div className="ag-figure ag-count">
         {value}
       </div>
       <div className="mt-2">
@@ -37,7 +37,7 @@ function Count({ label, value, kind, note }) {
 /** The moment: the vault's real latest decisions, as a ledger card. */
 function LedgerCard() {
   const stats = useChain(() => viewVault('get_stats'));
-  const latest = useChain(() => viewVault('get_payments', { from_index: 0, limit: cfg.logMax }).then((l) => [...l].reverse().slice(0, 4)));
+  const latest = useChain(() => viewVault('get_payments', { from_index: 0, limit: cfg.logMax }).then((l) => [...l].reverse().slice(0, 3)));
   return (
     <div className="ag-ledger-card ag-enter-2">
       <div className="ag-card-head">

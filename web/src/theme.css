@@ -204,11 +204,13 @@ code { font-size: 0.85em; color: var(--ag-text); background: var(--ag-surface-su
 .ag-gauge-fill.is-over { background: var(--ag-blocked); }
 
 /* ---------- home hero ---------- */
-.ag-hero { padding: 72px 0 8px; }
+.ag-hero { padding: 48px 0 8px; }
 .ag-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--ag-text-2); background: var(--ag-surface); padding: 4px 12px 4px 10px; border-radius: 999px; box-shadow: var(--ag-shadow-border); margin-bottom: 24px; }
-.ag-hero h1 { font-size: clamp(40px, 5.4vw, 64px); line-height: 1.03; letter-spacing: -0.035em; font-weight: 600; margin: 0 0 20px; text-wrap: balance; }
+.ag-hero h1 { font-size: clamp(32px, 3.6vw, 46px); line-height: 1.1; letter-spacing: -0.025em; font-weight: 500; margin: 0 0 16px; text-wrap: balance; }
 .ag-hero h1 .ag-hero-em { color: var(--ag-accent); }
-.ag-hero-sub { font-size: 19px; line-height: 29px; color: var(--ag-text-2); max-width: 34rem; margin: 0 0 32px; text-wrap: pretty; }
+.ag-hero-sub { font-size: 17px; line-height: 27px; color: var(--ag-text-2); max-width: 32rem; margin: 0 0 28px; text-wrap: pretty; }
+.ag-ledger-card .ag-figure { font-size: 24px; }
+.ag-ledger-card .ag-count { font-size: 20px; }
 .ag-ledger-card { background: var(--ag-surface); border: 1px solid transparent; border-radius: 18px; box-shadow: var(--ag-shadow-float); overflow: hidden; }
 .ag-ledger-card .ag-card-head { padding: 14px 20px; background: var(--ag-surface-muted); border-bottom: 1px solid var(--ag-line); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .ag-ledger-card .ag-card-foot { padding: 14px 20px; background: var(--ag-surface-muted); border-top: 1px solid var(--ag-line); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
@@ -223,8 +225,8 @@ code { font-size: 0.85em; color: var(--ag-text); background: var(--ag-surface-su
 .ag-incident { border-left: 3px solid var(--ag-blocked); }
 
 @media (max-width: 767.98px) {
-  .ag-hero { padding: 40px 0 8px; }
-  .ag-hero-sub { font-size: 17px; line-height: 26px; }
+  .ag-hero { padding: 32px 0 8px; }
+  .ag-hero-sub { font-size: 16px; line-height: 25px; }
   .ag-section { margin-top: 56px; }
   .ag-page-title { font-size: 28px; }
   .ag-panel-pad { padding: 20px; }
