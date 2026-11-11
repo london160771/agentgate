@@ -1,0 +1,20 @@
+# Rust
+target/
+contract/target/
+
+# Node
+node_modules/
+web/dist/
+
+# Secrets: never commit
+.env
+.env.*
+!.env.example
+*.pem
+.near-credentials/
+credentials/
+**/neardev/
+
+# OS / editor
+.DS_Store
+*.log

@@ -1,0 +1,29 @@
+{
+  "network": "testnet",
+  "ownerAccountId": "<set by Adesope>",
+  "vaultAccountId": "vault.<owner>.testnet",
+  "recipients": {
+    "apiProvider": "api-provider.<owner>.testnet",
+    "dataProvider": "data-provider.<owner>.testnet",
+    "hacker": "hacker.<owner>.testnet"
+  },
+  "agents": {
+    "apiBuyer": {
+      "name": "api-buyer",
+      "perTxCapNear": "0.5",
+      "dailyCapNear": "0.6",
+      "allowed": ["apiProvider", "dataProvider"],
+      "keyAllowanceNear": "0.25"
+    },
+    "oldBot": { "name": "old-bot", "revoked": true }
+  },
+  "demoKeys": {
+    "apiBuyerPublicKey": "<filled after seeding>",
+    "apiBuyerPrivateKey": "<filled after seeding — PUBLIC ON PURPOSE>",
+    "oldBotPublicKey": "<filled after seeding>",
+    "oldBotPrivateKey": "<filled after seeding — PUBLIC ON PURPOSE, key is revoked>"
+  },
+  "vaultFundingNear": "5",
+  "holdQueueMax": 20,
+  "logMax": 100
+}
