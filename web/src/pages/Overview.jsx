@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { formatNear, shortKey } from '../../../scripts/lib/format.js';
 import { lockStatus } from '../../../scripts/lib/lock.js';
 import { ChainView, Ext, Icon, Mono, StatusChip } from '../components/ui.jsx';
-import { accessKeysLink } from '../lib/links.js';
+import { accessKeysLink, accountLink } from '../lib/links.js';
 import { cfg, vaultAccessKeys, viewVault } from '../lib/near.js';
 import { useChain } from '../lib/useChain.js';
 
@@ -37,7 +37,7 @@ function Count({ label, value, kind, note }) {
 /** The moment: the vault's real latest decisions, as a ledger card. */
 function LedgerCard() {
   const stats = useChain(() => viewVault('get_stats'));
-  const latest = useChain(() => viewVault('get_payments', { from_index: 0, limit: cfg.logMax }).then((l) => [...l].reverse().slice(0, 3)));
+  const latest = useChain(() => viewVault('get_payments', { from_index: 0, limit: cfg.logMax }).then((l) => [...l].reverse().slice(0, 2)));
   return (
     <div className="ag-ledger-card ag-enter-2">
       <div className="ag-card-head">
@@ -107,6 +107,10 @@ export default function Overview() {
       <section className="ag-hero">
         <div className="row g-5 align-items-center">
           <div className="col-12 col-lg-6 ag-enter">
+            <a className="ag-eyebrow" href={accountLink(cfg.vaultAccountId)} target="_blank" rel="noreferrer">
+              <span className="ag-dot" aria-hidden="true" />
+              Live on NEAR testnet · real transactions
+            </a>
             <h1>
               The AI can be fooled.
               <br />
@@ -127,7 +131,19 @@ export default function Overview() {
             </div>
           </div>
           <div className="col-12 col-lg-6">
-            <LedgerCard />
+            <div className="ag-hero-visual">
+              <img
+                className="ag-hero-photo"
+                src="/hero-vault-1200.webp"
+                srcSet="/hero-vault-700.webp 700w, /hero-vault-1200.webp 1200w"
+                sizes="(min-width: 992px) 50vw, 100vw"
+                alt=""
+              />
+              <LedgerCard />
+              <a className="ag-photo-credit" href="https://unsplash.com/photos/steel-bank-vault-door-locking-wheel-3wPJxh-piRw" target="_blank" rel="noreferrer">
+                Photo: Jason Dent / Unsplash
+              </a>
+            </div>
           </div>
         </div>
       </section>

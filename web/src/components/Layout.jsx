@@ -15,17 +15,6 @@ const NAV = [
 export default function Layout() {
   return (
     <>
-      <div className="ag-strip">
-        <div className="container d-flex flex-wrap align-items-center gap-2">
-          <span className="ag-dot" aria-hidden="true" />
-          <span>
-            Real transactions on NEAR testnet. Every number is read live from{' '}
-            <a className="font-monospace" href={accountLink(cfg.vaultAccountId)} target="_blank" rel="noreferrer">
-              {cfg.vaultAccountId}
-            </a>
-          </span>
-        </div>
-      </div>
       <nav className="ag-nav">
         <div className="container">
           <NavLink className="ag-brand" to="/">
@@ -61,11 +50,20 @@ export default function Layout() {
         <Outlet />
       </main>
       <footer className="ag-footer">
-        <div className="container d-flex flex-wrap gap-2 justify-content-between">
-          <span>Built at NEAR HACKATHON · testnet only · no backend, no signup</span>
-          <a href="https://github.com/london160771/agentgate" target="_blank" rel="noreferrer">
-            Source on GitHub
-          </a>
+        <div className="container d-flex flex-wrap gap-3 justify-content-between">
+          <span className="d-inline-flex flex-wrap align-items-center gap-2">
+            <span className="ag-dot" aria-hidden="true" />
+            Real transactions on NEAR testnet. Every number is read live from{' '}
+            <a className="font-monospace" href={accountLink(cfg.vaultAccountId)} target="_blank" rel="noreferrer">
+              {cfg.vaultAccountId}
+            </a>
+          </span>
+          <span>
+            Built at NEAR HACKATHON · no backend, no signup ·{' '}
+            <a href="https://github.com/london160771/agentgate" target="_blank" rel="noreferrer">
+              Source on GitHub
+            </a>
+          </span>
         </div>
       </footer>
     </>

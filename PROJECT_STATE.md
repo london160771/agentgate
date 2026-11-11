@@ -39,6 +39,9 @@ P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
 
 ## Log
 
+### Web: hero photo + testnet line moved (2026-11-11, Adesope asked)
+The blue "Real transactions on NEAR testnet…" strip above the navbar is gone. The same sentence (with the vault link) is now in the footer on every page, and the home hero has a small "Live on NEAR testnet · real transactions" pill above the headline. Hero photo: steel bank vault door by Jason Dent on Unsplash (photo `3wPJxh-piRw`, Unsplash License, free to use, credit shown on the photo), self-hosted as `web/public/hero-vault-{700,1200}.webp` (46 KB / 126 KB). The vault card overlaps the bottom of the photo and now shows the 2 latest decisions. Files: `web/src/components/Layout.jsx`, `web/src/pages/Overview.jsx`, `web/src/theme.css`, `web/public/hero-vault-*.webp`. Checks: `npm run build` OK · `vitest` 31/31 · headless Chromium 1536px and iPhone 13: no overflow, no page errors.
+
 ### Web: smaller, lighter home hero (2026-11-11, Adesope: "hero section is too big and bold")
 Headline `clamp(32px, 3.6vw, 46px)` weight 500 (was up to 64px weight 600), sub 17px, hero top padding 48px (32px on phones). Vault card: balance 24px, counts 20px, 3 latest decisions (was 4). Files: `web/src/theme.css`, `web/src/pages/Overview.jsx`. Checks: `npm run build` OK · `vitest` 31/31 · headless Chromium 1536px and iPhone 13: no overflow, no page errors.
 
