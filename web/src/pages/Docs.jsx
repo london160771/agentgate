@@ -227,6 +227,7 @@ cd scripts && npm install && cd ..
 node scripts/attacks.js             # run all 7 attacks
 node scripts/attacks.js --only=J5   # run one attack
 node scripts/agent.js               # demo agent story (scripted)
+node scripts/try-agent.js           # your vault: 3 requests with your agent key
 node scripts/owner.js status        # owner: list held payments
 node scripts/owner.js approve <id>  # owner: approve / reject / revoke`}</pre>
             <p>Add <code>--dry-run</code> to any script to print the plan without sending anything.</p>

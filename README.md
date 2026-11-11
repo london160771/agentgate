@@ -103,6 +103,8 @@ Any NEAR testnet wallet can create its own vault and plug in its own agent. No s
 4. Copy the private key and the setup snippet (shown once) into your agent, like an API key. The site never stores it.
 5. Your agent calls `request_spend`. Every request appears on your vault page as PAID, HELD or BLOCKED; you approve or reject held ones, add funds, or revoke the agent.
 
+No agent yet? `node scripts/try-agent.js` asks for your vault id and agent key (hidden) and makes 3 real requests as your agent: a small payment to your first approved recipient (PAID), the same to an unknown account (HELD), and one over your per-payment cap (BLOCKED_OVER_TX_CAP). Checked on the demo vault on 2026-11-11: 3/3 as expected, [`evidence/try-agent-2026-11-11T21-47-24Z.json`](evidence/try-agent-2026-11-11T21-47-24Z.json).
+
 Each wallet sees the vaults it created at `/app`; every vault has its own page at `/v/<vault id>`.
 
 ## Why NEAR
