@@ -8,7 +8,7 @@ import { test } from 'node:test';
 import { EVIDENCE_DIR, ROOT } from '../lib/node.js';
 
 const CONFIG = path.join(ROOT, 'config', 'seed.json');
-const run = (cmd, args) => execFileSync(cmd, args, { cwd: ROOT, encoding: 'utf8', env: { ...process.env, NEAR_RPC: 'http://127.0.0.1:9' } });
+const run = (cmd, args) => execFileSync(cmd, args, { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env, NEAR_RPC: 'http://127.0.0.1:9' } });
 
 const RUNS = [
   ['node', ['scripts/seed.js', '--dry-run']],
