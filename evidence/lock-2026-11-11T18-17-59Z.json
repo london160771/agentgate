@@ -1,0 +1,62 @@
+{
+  "script": "lock-vault.js",
+  "at": "2026-11-11T18:17:59.825Z",
+  "network": "testnet",
+  "vault": "vault.agentgate-ayo.testnet",
+  "owner": "agentgate-ayo.testnet",
+  "txHash": "8mo1vVL7ZKyTHdGWSJVwjLviEMxsgKV13mJUP1M6WPzV",
+  "explorer": "https://testnet.nearblocks.io/txns/8mo1vVL7ZKyTHdGWSJVwjLviEMxsgKV13mJUP1M6WPzV",
+  "deleted": [
+    "ed25519:3zfLDHfUwEAwSbeERoLFmcxeHzSXU7m6cBVtVQxAPVVa"
+  ],
+  "before": {
+    "block_hash": "8RRnNqYTzHbTktCXg2QWhwy1wGydNEKkq4wY2UHdn57a",
+    "block_height": 277251198,
+    "keys": [
+      {
+        "access_key": {
+          "nonce": 277217309000011,
+          "permission": {
+            "FunctionCall": {
+              "allowance": "247248998349340700000000",
+              "method_names": [
+                "request_spend"
+              ],
+              "receiver_id": "vault.agentgate-ayo.testnet"
+            }
+          }
+        },
+        "public_key": "ed25519:z28Hcnsj7hVXok3Dd4mNXepDkpYQdqiDYXf2qs7eR2S"
+      },
+      {
+        "access_key": {
+          "nonce": 277215963000001,
+          "permission": "FullAccess"
+        },
+        "public_key": "ed25519:3zfLDHfUwEAwSbeERoLFmcxeHzSXU7m6cBVtVQxAPVVa"
+      }
+    ]
+  },
+  "after": {
+    "block_hash": "Fmd5b7FHoLwpU65y6BgCi9t3wm8oBxmC2sxpSnUmHjPT",
+    "block_height": 277251204,
+    "keys": [
+      {
+        "access_key": {
+          "nonce": 277217309000011,
+          "permission": {
+            "FunctionCall": {
+              "allowance": "247248998349340700000000",
+              "method_names": [
+                "request_spend"
+              ],
+              "receiver_id": "vault.agentgate-ayo.testnet"
+            }
+          }
+        },
+        "public_key": "ed25519:z28Hcnsj7hVXok3Dd4mNXepDkpYQdqiDYXf2qs7eR2S"
+      }
+    ]
+  },
+  "result": "LOCKED"
+}

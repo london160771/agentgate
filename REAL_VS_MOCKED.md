@@ -16,5 +16,5 @@ Filled from `evidence/` on 2026-11-11. Every "Real" row points to a raw output o
 | Unit-test mocks | **Mocks**, only inside test files: a mock vault in `scripts/test/attacks.test.js`, a mock RPC context in `web/src/test/judge.test.js`, near-sdk's testing env in `contract/src/tests.rs` | test files |
 | Owner actions (approve / reject / revoke) | **Real**: CLI (`scripts/owner.js`) and, since P1-a, web buttons signed through NEAR Wallet Selector + MyNearWallet. The web flow was checked up to the wallet's sign page (the request carries the owner as signer, the vault as receiver and the right method); a confirmed web-signed tx is still to be done by Adesope | `scripts/owner.js` · `web/src/lib/wallet.js` |
 | Mainnet | **Not used** | — |
-| Vault lock (removing the vault's full-access key) | **Not built** (roadmap, P1) | — |
+| Vault lock (removing the vault's full-access key) | **Real**: run on testnet 2026-11-11 18:17 UTC; the vault now has no full-access key, only the api-buyer `FunctionCall` key | [`evidence/lock-2026-11-11T18-17-59Z.json`](evidence/lock-2026-11-11T18-17-59Z.json) · tx [`8mo1vVL7…`](https://testnet.nearblocks.io/txns/8mo1vVL7ZKyTHdGWSJVwjLviEMxsgKV13mJUP1M6WPzV) |
 | TEE / Shade Agent passport | **Not built** (roadmap, P1) | — |

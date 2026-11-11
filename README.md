@@ -95,8 +95,8 @@ On most chains one key controls everything, so agent-wallet tools need an off-ch
 ## Proof
 **Tests** (offline, run in the cloud build on 2026-11-11):
 - Contract: `cd contract && cargo test` → **33 passed**, including a 500-request random run that checks the guarantee after every request.
-- Scripts: `cd scripts && node --test` → **48 passed**.
-- Web: `cd web && npx vitest run` → **21 passed**.
+- Scripts: `cd scripts && node --test` → **53 passed**.
+- Web: `cd web && npx vitest run` → **30 passed**.
 
 **Gate 0** (can a contract-minted key really be limited by NEAR?), testnet, 2026-11-11, raw output in [`evidence/gate0.json`](evidence/gate0.json): **PASS 4/4**.
 
@@ -119,13 +119,15 @@ On most chains one key controls everything, so agent-wallet tools need an off-ch
 | J6 | Leaked key: change rules | REFUSED_BY_NEAR: METHOD_NOT_ALLOWED | **REFUSED_BY_NEAR: METHOD_NOT_ALLOWED** | `AccessKeyMethodNameMismatchActionError` |
 | J7 | Revoked key | REFUSED_BY_NEAR: KEY_NOT_FOUND | **REFUSED_BY_NEAR: KEY_NOT_FOUND** | `AccessKeyDoesNotExistError` |
 
+**Vault lock**, testnet, 2026-11-11 18:17 UTC, raw output in [`evidence/lock-2026-11-11T18-17-59Z.json`](evidence/lock-2026-11-11T18-17-59Z.json): **LOCKED**. One transaction ([`8mo1vVL7…`](https://testnet.nearblocks.io/txns/8mo1vVL7ZKyTHdGWSJVwjLviEMxsgKV13mJUP1M6WPzV)) deleted the vault's only full-access key (`ed25519:3zfLDHfU…`). Before: 2 keys (1 FullAccess, 1 FunctionCall). After: 1 key, the api-buyer `FunctionCall` key limited to `request_spend` on the vault. Nobody, including the owner, can now sign a transfer, redeploy the contract or add a key on the vault account directly. Money moves only through the contract's rules. Check it live on the [vault's access keys](https://testnet.nearblocks.io/address/vault.agentgate-ayo.testnet?tab=accesskeys).
+
 How the demo vault was set up (funding, both agent keys minted, old-bot revoked): [`evidence/seed-2026-11-11T12-46-08Z.json`](evidence/seed-2026-11-11T12-46-08Z.json).
 
 ## What's real and what's not
 Gate 0, the Attack Suite and the dashboard numbers are real NEAR testnet results. Mocks exist only inside unit tests. Full list: [REAL_VS_MOCKED.md](REAL_VS_MOCKED.md).
 
 ## Honest limits
-- **Testnet only.** No contract audit yet. The vault account still has the full-access key it was created with (held by the owner, never in this repo); removing it ("vault lock") is on the roadmap. Mainnet is on the [roadmap](ROADMAP.md).
+- **Testnet only.** No contract audit yet. The vault is locked (no full-access key), so this contract can never be upgraded: a bug fix would need a new vault. Mainnet is on the [roadmap](ROADMAP.md).
 - Someone with the leaked key can **burn its gas allowance** (0.25 NEAR). The agent then needs a new key.
 - Someone with the leaked key can **use up the daily cap**, but only by paying approved recipients. The money can't reach them.
 - The held queue can be filled with junk requests (max 20). New unknown-recipient requests are then blocked until the owner clears it.

@@ -11,12 +11,12 @@ P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
 4. **Post on X**: tag @NEARProtocol, #NEARHackathon, attach the video.
 5. **Fill the TODO links** in `README.md` (search `TODO(Adesope)`: Vercel URL ×2, video URL, X post URL). Send them to the agent or edit them yourself.
 6. **Create the mainnet payout account** for the prize.
-6a. **P1-b vault lock (permanent)**, best after steps 1–2 so you know the contract needs no more changes: `cd ~/agentgate && git pull`, then `node scripts/lock-vault.js` (checks only, sends nothing), then `node scripts/lock-vault.js --confirm`. Attach the new `evidence/lock-<time>.json` in chat; the agent then updates README / REAL_VS_MOCKED with the proof.
+6a. ~~**P1-b vault lock**~~ **DONE** 2026-11-11 18:17 UTC (tx `8mo1vVL7…`, `evidence/lock-2026-11-11T18-17-59Z.json`). Old instructions:, best after steps 1–2 so you know the contract needs no more changes: `cd ~/agentgate && git pull`, then `node scripts/lock-vault.js` (checks only, sends nothing), then `node scripts/lock-vault.js --confirm`. Attach the new `evidence/lock-<time>.json` in chat; the agent then updates README / REAL_VS_MOCKED with the proof.
 6b. **P1-a live check (owner buttons)**: put your owner account into MyNearWallet testnet with `near account export-account agentgate-ayo.testnet using-web-wallet network-config testnet` (it opens or prints a testnet.mynearwallet.com import link; open it in your browser). Then on the site press **Owner sign in**, allow pop-ups, go to `/activity` and press **Reject** on held payment #3 (or do it on camera for the video). The wallet pop-up shows the tx; confirm it. The row should disappear and a tx link appear.
 7. **Submit the form before 16:00 UTC on 14 Nov 2026.**
 
 ## Current phase
-**⛔ Manual Stop B: launch (Adesope)**. Phases 1–4 are done; the checklist is above. Adesope said "go p1a" (2026-11-11 15:02 UTC): **P1-a done** (owner buttons). Adesope said "go p1b" (15:30 UTC): **P1-b script ready**, waiting for Adesope to run the lock (step 6a). P1-c stays roadmap / vision only (Adesope, 15:30 UTC).
+**⛔ Manual Stop B: launch (Adesope)**. Phases 1–4 are done; the checklist is above. Adesope said "go p1a" (2026-11-11 15:02 UTC): **P1-a done** (owner buttons). Adesope said "go p1b" (15:30 UTC): **P1-b done**: Adesope ran the lock at 18:17 UTC; the vault has no full-access key. P1-c stays roadmap / vision only (Adesope, 15:30 UTC).
 
 ## Phase status
 | Phase | Status | Commit | Checks |
@@ -27,7 +27,7 @@ P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
 | 3. Web + Attack Lab | done | 55ce9ee | `npm run build` OK · `vitest` 21/21 · no hardcoded seed numbers |
 | 4. README + proof docs | done | 7617c37 | numbers checked against `config/seed.json` + `evidence/`; tests re-run 33 / 48 / 21 pass |
 | ⛔ B. Launch (Adesope) | **active** | | checklist at the top |
-| P1-b. Vault lock | script done (638903e); lock not run yet | 638903e | `node --test` 53/53 · dry run OK · live pre-check refuses a wrong key |
+| P1-b. Vault lock | done: script 638903e, lock run by Adesope 2026-11-11 18:17 UTC | 638903e | `node --test` 53/53 · dry run OK · live pre-check refuses a wrong key |
 | P1-a. Owner actions in UI | done | 549a60d | `vitest` 29/29 · build OK · wallet flow checked up to the MyNearWallet sign page |
 
 ## Known facts
@@ -38,6 +38,12 @@ P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
 - near-sdk 5.30.1 refuses a plain native `cargo clippy` (it emits a compile_error telling you to use cargo-near). Working lint commands: `cargo clippy --all-targets -- -D warnings` (native, includes tests) and `cargo clippy --target wasm32-unknown-unknown -- -D warnings`.
 
 ## Log
+
+### P1-b: vault locked on testnet (2026-11-11 18:17 UTC, run by Adesope)
+Adesope ran `node scripts/lock-vault.js --confirm` and attached `evidence/lock-2026-11-11T18-17-59Z.json` (result LOCKED, tx `8mo1vVL7ZKyTHdGWSJVwjLviEMxsgKV13mJUP1M6WPzV`, deleted `ed25519:3zfLDHfU…`).
+**Checked from the cloud** (testnet RPC): `view_access_key_list` on the vault at block 277251453 returns 1 key, `ed25519:z28Hcnsj…` FunctionCall; `tx` status for the lock tx = `SuccessValue`.
+**Docs**: README Proof gains a Vault lock paragraph and Honest limits now say the vault can't be upgraded; README test counts refreshed (scripts 53, web 30, both re-run now); REAL_VS_MOCKED vault lock row = Real; evidence/README lists `lock-*.json`.
+**Checks**: `node --test` 53/53 · `vitest` 30/30.
 
 ### Design v2 merged to main (2026-11-11, Adesope: "merge")
 `design-unslop` fast-forwarded into `main` (81b2e84). The Vercel production deploy is triggered by the push (Adesope's Git integration, not a deploy by the agent).
