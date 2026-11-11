@@ -3,36 +3,16 @@
 > Progress log. Updated by the coding agent at the end of every phase. Newest entry at the top.
 > If a ⛔ MANUAL STOP is active, its checklist sits right under this line.
 
-## ⛔ MANUAL STOP A: Gate 0 on Adesope's machine (active)
-Phases 1 and 2 are done and pushed. The cloud sandbox can't reach NEAR, so these steps run on your machine, from the repo root:
-
-1. Install near-cli-rs and cargo-near, the wasm target and Node 22.22+ (exact commands in `scripts/setup-accounts.md`, step 0). Then `cd scripts && npm install && cd ..`.
-2. Follow `scripts/setup-accounts.md`: faucet owner + 4 sub-accounts (vault with 3 NEAR, api-provider / data-provider / hacker with 0.1 NEAR each), all keys saved to the legacy keychain.
-3. Fill `ownerAccountId` in `config/seed.json` (only that field). Check: `node scripts/seed.js --dry-run` shows your real account ids.
-4. `bash scripts/deploy.sh`
-5. `node scripts/seed.js` (writes the two demo keys into `config/seed.json` and `evidence/seed-*.json`)
-6. `node scripts/gate0.js` → paste the whole output back in the chat, and commit/push `config/seed.json` + `evidence/` (or paste `evidence/gate0.json`).
-7. `node scripts/attacks.js` → paste the whole output back (and `evidence/attacks-*.json`).
-
-Before committing, check `git diff --cached`: only `config/seed.json` (demo keys) and `evidence/` should change. Never add anything from `~/.near-credentials`.
-
-After you paste the results: if Gate 0 passes, the classifier gets matched to the real error names, the evidence is saved and Phase 3 starts. If Gate 0 fails, the agent stops and reports; no redesign.
-
-### Gate 0 progress (Adesope's machine, WSL Ubuntu)
-- Done: tools installed, `npm test` 46/46 on his machine; accounts created (owner `agentgate-ayo.testnet`, vault, api-provider, data-provider, hacker); `deploy.sh` OK (wasm 198,614 bytes, `get_owner` = `agentgate-ayo.testnet`); `seed.js` OK (api-buyer key `ed25519:z28Hcnsj7hVXok3Dd4mNXepDkpYQdqiDYXf2qs7eR2S` = FunctionCall → vault, `[request_spend]`, 0.25 NEAR allowance; old-bot revoked).
-- Gate 0 run 1: (a) PASS (OK_PAID). (b)(c)(d) were refused by NEAR exactly as designed (raw: `AccessKeyNotEnoughAllowanceActionError`, `AccessKeyMethodNameMismatchActionError`, `AccessKeyDoesNotExistError`), but reported FAIL because near-api-js's FailoverRpcProvider re-sent each refused tx to the second RPC and wrapped the real error in `FailoverRpcError: Exceeded 2 providers`. Old-bot key confirmed gone from the vault.
-- Fixes: scripts use a single RPC provider; the classifier unwraps `FailoverRpcError`; J5 / Gate 0 (b) transfer is 0.01 NEAR (was 1 NEAR, more than the key's 0.25 allowance, so NEAR refused it on allowance before reaching the permission check). PRD section 8 J5 row updated to match; Adesope approved 0.01 NEAR (2026-11-11).
-
 ## Current phase
-**⛔ Manual Stop A: Gate 0** (waiting for Adesope). Next after it: Phase 3, web dashboard + Attack Lab.
+**Phase 3: Web dashboard + Attack Lab**: in progress. ⛔ Manual Stop A is done: **Gate 0 PASS** and all 7 attacks as expected on testnet (2026-11-11).
 
 ## Phase status
 | Phase | Status | Commit | Checks |
 |---|---|---|---|
 | 1. Scaffold + contract | done | 959fa7f | `cargo test` 33/33 pass · fmt OK · clippy OK · `cargo near build` OK (198,680 bytes) |
-| 2. Scripts + classifier | done | see log | `node --test` 46/46 pass · 12 dry-runs exit 0 |
-| ⛔ A. Gate 0 (Adesope) | **active** | | |
-| 3. Web + Attack Lab | not started | | |
+| 2. Scripts + classifier | done | 7bdf80c | `node --test` 46/46 pass · 12 dry-runs exit 0 |
+| ⛔ A. Gate 0 (Adesope) | **done: PASS** | ef878ce + evidence commit | Gate 0 4/4 PASS · Attack Suite 7/7 as expected · `node --test` 48/48 |
+| 3. Web + Attack Lab | in progress | | |
 | 4. README + proof docs | not started | | |
 | ⛔ B. Launch (Adesope) | waiting | | |
 
@@ -44,6 +24,24 @@ After you paste the results: if Gate 0 passes, the classifier gets matched to th
 - near-sdk 5.30.1 refuses a plain native `cargo clippy` (it emits a compile_error telling you to use cargo-near). Working lint commands: `cargo clippy --all-targets -- -D warnings` (native, includes tests) and `cargo clippy --target wasm32-unknown-unknown -- -D warnings`.
 
 ## Log
+
+### ⛔ Manual Stop A: Gate 0 on testnet (2026-11-11, Adesope's machine, WSL Ubuntu)
+**Accounts**: owner `agentgate-ayo.testnet` (faucet, 10 NEAR); `vault.agentgate-ayo.testnet` (3 NEAR); `api-provider`, `data-provider`, `hacker` `.agentgate-ayo.testnet` (0.1 NEAR each). Keys in his legacy keychain only.
+**Deploy**: `bash scripts/deploy.sh` → wasm 198,614 bytes (Rust 1.99.1, cargo-near 0.23.0), deploy + `new` tx `4X9PpRtdhLhU2HBD3pWcTunPoy5MJyPwFB5F6Z9pqw1H`, `get_owner` = `agentgate-ayo.testnet`.
+**Seed** (`evidence/seed-2026-11-11T12-46-08Z.json`): fund 5 NEAR, `add_agent` api-buyer `ed25519:z28Hcnsj7hVXok3Dd4mNXepDkpYQdqiDYXf2qs7eR2S`, `add_agent` old-bot `ed25519:6rGG6RmtyrnCLgmhbR3ejpXyEMdscqKsHrRp1WDfzdeZ`, `revoke_agent` old-bot. The vault's access-key list shows the api-buyer key as `FunctionCall { receiver_id: vault.agentgate-ayo.testnet, method_names: [request_spend], allowance: 0.25 NEAR }`. (The seed-time list still showed old-bot because it was read at `final` finality a moment before the delete landed; Gate 0 confirms it is gone.)
+**Gate 0 run 1**: (a) PASS; (b)(c)(d) were refused by NEAR but reported FAIL because near-api-js's FailoverRpcProvider re-sent each refused tx to a second RPC and wrapped the error (`FailoverRpcError: Exceeded 2 providers`). (b) with 1 NEAR was refused as `AccessKeyNotEnoughAllowanceActionError` (amount > 0.25 allowance is checked before permissions).
+**Fixes** (ef878ce): single RPC provider; classifier unwraps `FailoverRpcError`; J5 transfer 1 → 0.01 NEAR (approved by Adesope; PRD 8 J5 row updated).
+**Gate 0 run 2** (`evidence/gate0.json`): **PASS** 4/4.
+| check | expected | actual | raw |
+|---|---|---|---|
+| (a) request_spend | OK_PAID | PAID | tx `2zNeXx6bcdbVrBcE2XqRwUJybLd7X338KnonCi58bfaH` |
+| (b) direct Transfer 0.01 | TRANSFER_NOT_ALLOWED | TRANSFER_NOT_ALLOWED | `AccessKeyRequiresFullAccessActionError` |
+| (c) update_rules | METHOD_NOT_ALLOWED | METHOD_NOT_ALLOWED | `AccessKeyMethodNameMismatchActionError` |
+| (d) revoked key | KEY_NOT_FOUND | KEY_NOT_FOUND | `AccessKeyDoesNotExistError` |
+Classifier needed no change: all three real error names were already mapped.
+**Attack Suite** (`evidence/attacks-2026-11-11T12-57-38Z.json`): 7/7 as expected. J1 PAID · J2 HELD (payment #3, 5 NEAR to hacker) · J3 BLOCKED_OVER_TX_CAP · J4 PAID ×1, BLOCKED_OVER_DAILY_CAP ×4, today's total 0.53 ≤ 0.6 NEAR · J5/J6/J7 REFUSED_BY_NEAR (TRANSFER_NOT_ALLOWED / METHOD_NOT_ALLOWED / KEY_NOT_FOUND).
+**Committed**: `config/seed.json` with the two demo keys (public on purpose; api-buyer is capped by the vault, old-bot is revoked) and the 3 evidence files. No owner or vault key in the repo.
+**Test tweak**: config tests build their own template so they pass with the seeded config (48/48).
 
 ### Phase 2: Scripts + shared classifier (2026-11-11)
 **Built** (all of PRD 7 + 8, `scripts/`, Node ESM)

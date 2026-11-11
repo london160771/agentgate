@@ -1,0 +1,71 @@
+{
+  "script": "seed.js",
+  "at": "2026-11-11T12:45:55.553Z",
+  "network": "testnet",
+  "vault": "vault.agentgate-ayo.testnet",
+  "steps": [
+    {
+      "name": "transfer 5 NEAR to vault.agentgate-ayo.testnet",
+      "txHash": "2bB5DiKBwAnZSsbiupurZnd19gZJeLzkJP1BXJqzAqnW",
+      "explorer": "https://testnet.nearblocks.io/txns/2bB5DiKBwAnZSsbiupurZnd19gZJeLzkJP1BXJqzAqnW"
+    },
+    {
+      "name": "add_agent api-buyer ed25519:z28Hcnsj7hVXok3Dd4mNXepDkpYQdqiDYXf2qs7eR2S",
+      "txHash": "58z3b1TgvYAWZyrYhgcwDLVSeempa7P9vwsjR1RWjbUw",
+      "explorer": "https://testnet.nearblocks.io/txns/58z3b1TgvYAWZyrYhgcwDLVSeempa7P9vwsjR1RWjbUw"
+    },
+    {
+      "name": "add_agent old-bot ed25519:6rGG6RmtyrnCLgmhbR3ejpXyEMdscqKsHrRp1WDfzdeZ",
+      "txHash": "3CNXbpfLGXco3wK3pBJGNrdmEG4Qq2FJNQise1pNx88o",
+      "explorer": "https://testnet.nearblocks.io/txns/3CNXbpfLGXco3wK3pBJGNrdmEG4Qq2FJNQise1pNx88o"
+    },
+    {
+      "name": "revoke_agent old-bot",
+      "txHash": "GjCURBenf4eL3UDUywPmBfS3KUta4nP8wpDm9Rm9cRZc",
+      "explorer": "https://testnet.nearblocks.io/txns/GjCURBenf4eL3UDUywPmBfS3KUta4nP8wpDm9Rm9cRZc"
+    }
+  ],
+  "vaultAccessKeys": {
+    "block_hash": "4jrjPySq2MnyFP4DnGa31BwgtMMfzThbfoZUyvVnrhnH",
+    "block_height": 277217318,
+    "keys": [
+      {
+        "access_key": {
+          "nonce": 277217309000000,
+          "permission": {
+            "FunctionCall": {
+              "allowance": "250000000000000000000000",
+              "method_names": [
+                "request_spend"
+              ],
+              "receiver_id": "vault.agentgate-ayo.testnet"
+            }
+          }
+        },
+        "public_key": "ed25519:z28Hcnsj7hVXok3Dd4mNXepDkpYQdqiDYXf2qs7eR2S"
+      },
+      {
+        "access_key": {
+          "nonce": 277215963000001,
+          "permission": "FullAccess"
+        },
+        "public_key": "ed25519:3zfLDHfUwEAwSbeERoLFmcxeHzSXU7m6cBVtVQxAPVVa"
+      },
+      {
+        "access_key": {
+          "nonce": 277217314000000,
+          "permission": {
+            "FunctionCall": {
+              "allowance": "250000000000000000000000",
+              "method_names": [
+                "request_spend"
+              ],
+              "receiver_id": "vault.agentgate-ayo.testnet"
+            }
+          }
+        },
+        "public_key": "ed25519:6rGG6RmtyrnCLgmhbR3ejpXyEMdscqKsHrRp1WDfzdeZ"
+      }
+    ]
+  }
+}

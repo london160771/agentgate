@@ -12,16 +12,22 @@
       "name": "api-buyer",
       "perTxCapNear": "0.5",
       "dailyCapNear": "0.6",
-      "allowed": ["apiProvider", "dataProvider"],
+      "allowed": [
+        "apiProvider",
+        "dataProvider"
+      ],
       "keyAllowanceNear": "0.25"
     },
-    "oldBot": { "name": "old-bot", "revoked": true }
+    "oldBot": {
+      "name": "old-bot",
+      "revoked": true
+    }
   },
   "demoKeys": {
-    "apiBuyerPublicKey": "<filled after seeding>",
-    "apiBuyerPrivateKey": "<filled after seeding — PUBLIC ON PURPOSE>",
-    "oldBotPublicKey": "<filled after seeding>",
-    "oldBotPrivateKey": "<filled after seeding — PUBLIC ON PURPOSE, key is revoked>"
+    "apiBuyerPublicKey": "ed25519:z28Hcnsj7hVXok3Dd4mNXepDkpYQdqiDYXf2qs7eR2S",
+    "apiBuyerPrivateKey": "ed25519:2GeRYxjszfKDQb1vqwnyTzj5gweumimG8SkRq6eVH1WsVtPHs4Y2n7WWXWosM2fNoFcj3NiweX2PhyXPcrez3D6A",
+    "oldBotPublicKey": "ed25519:6rGG6RmtyrnCLgmhbR3ejpXyEMdscqKsHrRp1WDfzdeZ",
+    "oldBotPrivateKey": "ed25519:33jR4VXVr2BaKfnmUNmn9xYTHbrkS9D7yG3nUvS983xGbKKnGd4F63ryoVFrYwayWheQ8ABmKH13orMnr5VbgPQM"
   },
   "vaultFundingNear": "5",
   "holdQueueMax": 20,

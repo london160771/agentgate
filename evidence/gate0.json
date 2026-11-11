@@ -1,0 +1,172 @@
+{
+  "script": "gate0.js",
+  "at": "2026-11-11T12:55:14.956Z",
+  "network": "testnet",
+  "vault": "vault.agentgate-ayo.testnet",
+  "checks": [
+    {
+      "id": "a",
+      "title": "minted key calls request_spend",
+      "expect": "OK_PAID",
+      "actual": "PAID",
+      "pass": true,
+      "txHash": "2zNeXx6bcdbVrBcE2XqRwUJybLd7X338KnonCi58bfaH",
+      "step": {
+        "plan": "api-buyer key: request_spend(api-provider.agentgate-ayo.testnet, 0.01 NEAR, \"API credits\")",
+        "kind": "PAID",
+        "code": "OK_PAID",
+        "paymentId": 1,
+        "retryable": false,
+        "nextAction": "none",
+        "txHash": "2zNeXx6bcdbVrBcE2XqRwUJybLd7X338KnonCi58bfaH",
+        "raw": {
+          "payment_id": 1,
+          "status": "PAID",
+          "code": "OK_PAID",
+          "retryable": false,
+          "next_action": "none"
+        },
+        "label": "PAID",
+        "ok": true
+      }
+    },
+    {
+      "id": "b",
+      "title": "same key signs a direct Transfer",
+      "expect": "REFUSED_BY_NEAR: TRANSFER_NOT_ALLOWED",
+      "actual": "REFUSED_BY_NEAR: TRANSFER_NOT_ALLOWED",
+      "pass": true,
+      "step": {
+        "plan": "api-buyer key: Transfer 0.01 NEAR from the vault to hacker.agentgate-ayo.testnet",
+        "kind": "REFUSED_BY_NEAR",
+        "code": "TRANSFER_NOT_ALLOWED",
+        "errorName": "AccessKeyRequiresFullAccessActionError",
+        "message": "Access key requires full access",
+        "error": {
+          "name": "AccessKeyRequiresFullAccessActionError",
+          "message": "Access key requires full access",
+          "txHash": "",
+          "blockHash": "",
+          "actionIndex": null
+        },
+        "label": "REFUSED_BY_NEAR: TRANSFER_NOT_ALLOWED",
+        "ok": true
+      }
+    },
+    {
+      "id": "c",
+      "title": "same key calls update_rules",
+      "expect": "REFUSED_BY_NEAR: METHOD_NOT_ALLOWED",
+      "actual": "REFUSED_BY_NEAR: METHOD_NOT_ALLOWED",
+      "pass": true,
+      "step": {
+        "plan": "api-buyer key: update_rules({\"public_key\":\"ed25519:z28Hcnsj7hVXok3Dd4mNXepDkpYQdqiDYXf2qs7eR2S\",\"per_tx_cap\":\"1000000000000000000000000000\",\"daily_cap\":\"1000000000000000000000000000\",\"allowed\":[\"hacker.agentgate-ayo.testnet\"]})",
+        "kind": "REFUSED_BY_NEAR",
+        "code": "METHOD_NOT_ALLOWED",
+        "errorName": "AccessKeyMethodNameMismatchActionError",
+        "message": "Access key does not allow method update_rules",
+        "error": {
+          "name": "AccessKeyMethodNameMismatchActionError",
+          "message": "Access key does not allow method update_rules",
+          "txHash": "",
+          "blockHash": "",
+          "actionIndex": null,
+          "methodName": "update_rules"
+        },
+        "label": "REFUSED_BY_NEAR: METHOD_NOT_ALLOWED",
+        "ok": true
+      }
+    },
+    {
+      "id": "d",
+      "title": "revoked key calls request_spend",
+      "expect": "REFUSED_BY_NEAR: KEY_NOT_FOUND",
+      "actual": "REFUSED_BY_NEAR: KEY_NOT_FOUND",
+      "pass": true,
+      "step": {
+        "plan": "old-bot key: request_spend(api-provider.agentgate-ayo.testnet, 0.01 NEAR, \"old bot wakes up\")",
+        "kind": "REFUSED_BY_NEAR",
+        "code": "KEY_NOT_FOUND",
+        "errorName": "AccessKeyDoesNotExistError",
+        "message": "Access key ed25519:6rGG6RmtyrnCLgmhbR3ejpXyEMdscqKsHrRp1WDfzdeZ does not exist at block height 277218293",
+        "error": {
+          "name": "AccessKeyDoesNotExistError",
+          "message": "Access key ed25519:6rGG6RmtyrnCLgmhbR3ejpXyEMdscqKsHrRp1WDfzdeZ does not exist at block height 277218293",
+          "publicKey": {
+            "ed25519Key": {
+              "keyType": 0,
+              "data": {
+                "0": 86,
+                "1": 233,
+                "2": 38,
+                "3": 41,
+                "4": 250,
+                "5": 34,
+                "6": 99,
+                "7": 231,
+                "8": 62,
+                "9": 116,
+                "10": 135,
+                "11": 73,
+                "12": 54,
+                "13": 42,
+                "14": 136,
+                "15": 51,
+                "16": 13,
+                "17": 8,
+                "18": 49,
+                "19": 4,
+                "20": 174,
+                "21": 157,
+                "22": 140,
+                "23": 76,
+                "24": 55,
+                "25": 128,
+                "26": 45,
+                "27": 240,
+                "28": 160,
+                "29": 165,
+                "30": 224,
+                "31": 154
+              }
+            },
+            "enum": "ed25519Key"
+          },
+          "blockHash": "BWkDLUSv6ApN85M9RUJgrUzDXm7Lf2T8gqfrMNnYc8M3",
+          "blockHeight": 277218293
+        },
+        "label": "REFUSED_BY_NEAR: KEY_NOT_FOUND",
+        "ok": true
+      }
+    }
+  ],
+  "vaultAccessKeys": {
+    "block_hash": "BA2W2Q7vXXHs3jzCjdkKWgfBvwYvVNmxEjBYYtQzKame",
+    "block_height": 277218294,
+    "keys": [
+      {
+        "access_key": {
+          "nonce": 277217309000002,
+          "permission": {
+            "FunctionCall": {
+              "allowance": "249428722940812600000000",
+              "method_names": [
+                "request_spend"
+              ],
+              "receiver_id": "vault.agentgate-ayo.testnet"
+            }
+          }
+        },
+        "public_key": "ed25519:z28Hcnsj7hVXok3Dd4mNXepDkpYQdqiDYXf2qs7eR2S"
+      },
+      {
+        "access_key": {
+          "nonce": 277215963000001,
+          "permission": "FullAccess"
+        },
+        "public_key": "ed25519:3zfLDHfUwEAwSbeERoLFmcxeHzSXU7m6cBVtVQxAPVVa"
+      }
+    ]
+  },
+  "result": "PASS"
+}

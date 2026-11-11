@@ -6,13 +6,15 @@ import { agentRules, isAccountId, resolveConfig, validateConfig } from '../lib/c
 import { ROOT, readRawConfig } from '../lib/node.js';
 
 // The template as shipped (before Adesope set the owner), built from the real config.
-const template = () => ({ ...readRawConfig(), ownerAccountId: '<set by Adesope>' });
+const PLACEHOLDER_KEYS = { apiBuyerPublicKey: '<filled after seeding>', apiBuyerPrivateKey: '<filled after seeding>', oldBotPublicKey: '<filled after seeding>', oldBotPrivateKey: '<filled after seeding>' };
+const template = () => ({ ...readRawConfig(), ownerAccountId: '<set by Adesope>', demoKeys: { ...PLACEHOLDER_KEYS } });
 const withOwner = (owner = 'ade.testnet') => ({ ...template(), ownerAccountId: owner });
 
 test('the committed config/seed.json is valid', () => {
   assert.deepEqual(validateConfig(template(), 'template'), []);
   const raw = readRawConfig();
   if (!raw.ownerAccountId.includes('<')) assert.deepEqual(validateConfig(raw, 'owner'), []);
+  if (!raw.demoKeys.apiBuyerPublicKey.includes('<')) assert.deepEqual(validateConfig(raw, 'seeded'), []);
 });
 
 test('owner stage needs ownerAccountId', () => {
