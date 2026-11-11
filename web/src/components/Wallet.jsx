@@ -45,18 +45,18 @@ export function WalletControl() {
   const w = useWallet();
   if (!w.accountId) {
     return (
-      <button className="btn btn-sm btn-outline-light" onClick={w.signIn}>
+      <button className="btn btn-sm btn-quiet" onClick={w.signIn}>
         Owner sign in
       </button>
     );
   }
   return (
-    <div className="d-flex align-items-center gap-2 small text-light">
-      <span className={`badge ${w.isOwner ? 'text-bg-success' : 'text-bg-secondary'}`}>{w.isOwner ? 'owner' : 'not the owner'}</span>
-      <span className="text-truncate" style={{ maxWidth: '12rem' }}>
+    <div className="d-flex align-items-center gap-2 small">
+      <span className={`ag-stamp ag-stamp--${w.isOwner ? 'paid' : 'neutral'}`}>{w.isOwner ? 'owner' : 'not the owner'}</span>
+      <span className="text-truncate font-monospace text-secondary" style={{ maxWidth: '14rem' }}>
         {w.accountId}
       </span>
-      <button className="btn btn-sm btn-outline-light" onClick={w.signOut}>
+      <button className="btn btn-sm btn-ghost" onClick={w.signOut}>
         Sign out
       </button>
     </div>
@@ -66,10 +66,10 @@ export function WalletControl() {
 /** Banner under the navbar: wallet errors, or a note when a non-owner is signed in. */
 export function WalletNotice() {
   const w = useWallet();
-  if (w.error) return <div className="alert alert-warning small">Wallet: {String(w.error?.message || w.error)}</div>;
+  if (w.error) return <div className="ag-panel ag-panel-pad mt-4 small">Wallet: {String(w.error?.message || w.error)}</div>;
   if (w.accountId && w.owner && !w.isOwner)
     return (
-      <div className="alert alert-secondary small">
+      <div className="ag-panel ag-panel-pad mt-4 small text-secondary">
         Signed in as <Mono>{w.accountId}</Mono>. Only the vault owner (<Mono>{w.owner}</Mono>) can approve, reject or revoke, so no owner
         buttons are shown.
       </div>
@@ -78,7 +78,7 @@ export function WalletNotice() {
 }
 
 /** One owner action. Opens the wallet to confirm, then shows the tx link or the error. */
-export function OwnerButton({ method, args, label, variant = 'outline-primary', onDone }) {
+export function OwnerButton({ method, args, label, variant = 'quiet', onDone }) {
   const w = useWallet();
   const [state, setState] = useState({ busy: false, hash: '', error: '' });
   if (!w.isOwner) return null;
@@ -102,8 +102,8 @@ export function OwnerButton({ method, args, label, variant = 'outline-primary', 
         {state.busy ? 'Confirm in wallet…' : label}
       </button>
       {state.hash && (
-        <a className="small" href={txLink(state.hash)} target="_blank" rel="noreferrer">
-          tx {state.hash.slice(0, 8)}… ↗
+        <a className="small font-monospace" href={txLink(state.hash)} target="_blank" rel="noreferrer">
+          tx {state.hash.slice(0, 8)}…
         </a>
       )}
       {state.error && <span className="small text-danger text-break">{state.error}</span>}

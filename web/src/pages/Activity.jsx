@@ -1,9 +1,18 @@
 import { formatNear } from '../../../scripts/lib/format.js';
-import { ChainView, Mono, StatusChip } from '../components/ui.jsx';
+import { ChainView, Ext, Icon, Mono, PageHead, StatusChip } from '../components/ui.jsx';
 import { OwnerButton, useWallet } from '../components/Wallet.jsx';
 import { accountLink, nsToDate } from '../lib/links.js';
 import { cfg, viewVault } from '../lib/near.js';
 import { useChain } from '../lib/useChain.js';
+
+function Refresh({ state }) {
+  return (
+    <button className="btn btn-sm btn-ghost d-inline-flex align-items-center gap-2" onClick={state.reload} disabled={state.loading}>
+      <Icon name="refresh" size={14} />
+      Refresh
+    </button>
+  );
+}
 
 function HeldQueue({ onChange }) {
   const held = useChain(() => viewVault('get_held'));
@@ -13,43 +22,48 @@ function HeldQueue({ onChange }) {
     onChange();
   };
   return (
-    <section className="mb-4">
-      <div className="d-flex justify-content-between align-items-center">
-        <h2 className="h5 mb-2">Held for the owner</h2>
-        <button className="btn btn-sm btn-outline-secondary" onClick={held.reload} disabled={held.loading}>
-          Refresh
-        </button>
+    <section className="mb-5 ag-enter-2">
+      <div className="d-flex justify-content-between align-items-center mb-1">
+        <h2 className="ag-section-title">Held for the owner</h2>
+        <Refresh state={held} />
       </div>
-      <p className="small text-secondary">
-        Payments to unknown recipients wait here. They use no budget. The owner approves or rejects them: sign in as the owner to get
-        buttons (each one opens the wallet to confirm), or use the CLI from the repo root.
+      <p className="ag-section-sub">
+        Payments to unknown recipients wait here and use no budget. The owner approves or rejects them, from the buttons after signing in or from
+        the CLI.
       </p>
       <ChainView state={held} what="Reading the held queue">
         {(list) =>
           list.length === 0 ? (
-            <div className="text-secondary small">Nothing held right now.</div>
+            <div className="ag-panel ag-panel-pad small text-secondary">Nothing held right now</div>
           ) : (
-            <div className="list-group">
+            <div className="d-grid gap-3">
               {list.map((p) => (
-                <div className="list-group-item" key={p.id}>
-                  <div className="d-flex flex-wrap justify-content-between gap-2">
-                    <div>
-                      <StatusChip status="HELD" /> <strong>#{p.id}</strong> {p.agent_name} → <Mono>{p.to}</Mono> · {formatNear(p.amount)}
+                <div className="ag-panel ag-panel-pad" key={p.id}>
+                  <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+                    <div className="d-flex flex-wrap align-items-center gap-2">
+                      <StatusChip status="HELD" />
+                      <span className="font-monospace ag-muted small">#{p.id}</span>
+                      <span>
+                        {p.agent_name} → <Mono>{p.to}</Mono>
+                      </span>
                     </div>
-                    <span className="small text-secondary">{nsToDate(p.at)}</span>
+                    <span className="font-monospace">{formatNear(p.amount)}</span>
                   </div>
-                  <div className="small mt-1">“{p.reason}”</div>
+                  <p className="text-secondary mb-3">“{p.reason}”</p>
                   {isOwner && (
-                    <div className="d-flex flex-wrap gap-3 mt-2">
-                      <OwnerButton method="approve_held" args={{ payment_id: p.id }} label={`Approve: pay ${formatNear(p.amount)}`} variant="success" onDone={done} />
-                      <OwnerButton method="reject_held" args={{ payment_id: p.id }} label="Reject" variant="outline-danger" onDone={done} />
+                    <div className="d-flex flex-wrap gap-2 mb-3">
+                      <OwnerButton method="approve_held" args={{ payment_id: p.id }} label={`Approve and pay ${formatNear(p.amount)}`} variant="approve" onDone={done} />
+                      <OwnerButton method="reject_held" args={{ payment_id: p.id }} label="Reject" variant="reject" onDone={done} />
                     </div>
                   )}
-                  <Mono className="d-block small bg-light rounded p-2 mt-2">
-                    node scripts/owner.js approve {p.id}
-                    <br />
-                    node scripts/owner.js reject {p.id}
-                  </Mono>
+                  <div className="d-flex flex-wrap justify-content-between align-items-end gap-2">
+                    <code className="ag-keyblock flex-grow-1" style={{ fontSize: 12 }}>
+                      node scripts/owner.js approve {p.id}
+                      <br />
+                      node scripts/owner.js reject {p.id}
+                    </code>
+                  </div>
+                  <div className="ag-label mt-2">{nsToDate(p.at)}</div>
                 </div>
               ))}
             </div>
@@ -61,63 +75,56 @@ function HeldQueue({ onChange }) {
 }
 
 function PaymentLog({ log }) {
-  // get_payments returns the kept log (last logMax entries) oldest first; show newest first.
   return (
     <section>
-      <div className="d-flex justify-content-between align-items-center">
-        <h2 className="h5 mb-2">Payment log (last {cfg.logMax})</h2>
-        <button className="btn btn-sm btn-outline-secondary" onClick={log.reload} disabled={log.loading}>
-          Refresh
-        </button>
+      <div className="d-flex justify-content-between align-items-center mb-1">
+        <h2 className="ag-section-title">Payment log, last {cfg.logMax}</h2>
+        <Refresh state={log} />
       </div>
-      <p className="small text-secondary">
-        Every request the vault decided, including blocked ones. The contract does not store transaction hashes; each request is a
-        transaction on{' '}
-        <a href={accountLink(cfg.vaultAccountId)} target="_blank" rel="noreferrer">
-          the vault’s explorer page ↗
-        </a>
-        .
+      <p className="ag-section-sub">
+        Every request the vault decided, including blocked ones. The contract doesn’t store transaction hashes, and each request is a transaction on{' '}
+        <Ext href={accountLink(cfg.vaultAccountId)}>the vault’s explorer page</Ext>
       </p>
       <ChainView state={log} what="Reading the payment log">
         {(list) =>
           list.length === 0 ? (
-            <div className="text-secondary small">No payments yet.</div>
+            <div className="ag-panel ag-panel-pad small text-secondary">No payments yet</div>
           ) : (
-            <div className="table-responsive">
-              <table className="table table-sm align-middle small">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Status</th>
-                    <th>Code</th>
-                    <th>Agent</th>
-                    <th>To</th>
-                    <th className="text-end">Amount</th>
-                    <th>Reason</th>
-                    <th>Time</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {list.map((p) => (
-                    <tr key={p.id}>
-                      <td>{p.id}</td>
-                      <td>
-                        <StatusChip status={p.status} />
-                      </td>
-                      <td>
-                        <Mono>{p.code}</Mono>
-                      </td>
-                      <td>{p.agent_name}</td>
-                      <td>
-                        <Mono>{p.to}</Mono>
-                      </td>
-                      <td className="text-end text-nowrap">{formatNear(p.amount)}</td>
-                      <td className="text-break">{p.reason}</td>
-                      <td className="text-nowrap">{nsToDate(p.at)}</td>
+            <div className="ag-panel ag-panel-pad">
+              <div className="table-responsive">
+                <table className="ag-ledger">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Verdict</th>
+                      <th>Agent</th>
+                      <th>To</th>
+                      <th className="num">Amount</th>
+                      <th>Reason</th>
+                      <th>Time, UTC</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {list.map((p) => (
+                      <tr key={p.id}>
+                        <td className="font-monospace ag-muted">{p.id}</td>
+                        <td>
+                          <StatusChip status={p.code} />
+                        </td>
+                        <td className="text-secondary">{p.agent_name}</td>
+                        <td>
+                          <Mono className="small">{p.to}</Mono>
+                        </td>
+                        <td className="num">{formatNear(p.amount)}</td>
+                        <td className="text-secondary" style={{ minWidth: '12rem' }}>
+                          {p.reason}
+                        </td>
+                        <td className="font-monospace small ag-muted text-nowrap">{nsToDate(p.at).replace(' UTC', '')}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )
         }
@@ -130,7 +137,7 @@ export default function Activity() {
   const log = useChain(() => viewVault('get_payments', { from_index: 0, limit: cfg.logMax }).then((l) => [...l].reverse()));
   return (
     <>
-      <h1 className="h3">Activity</h1>
+      <PageHead title="Activity">Every decision the vault made, newest first, with the held queue on top.</PageHead>
       <HeldQueue onChange={log.reload} />
       <PaymentLog log={log} />
     </>

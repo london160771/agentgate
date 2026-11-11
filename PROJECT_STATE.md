@@ -39,6 +39,11 @@ P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
 
 ## Log
 
+### Design pass (unslop), branch `design-unslop` (2026-11-11, Adesope asked: "the web design is poor")
+**Direction**: a security vault at night. Ink-tinted dark neutral ramp, IBM Plex Sans + IBM Plex Mono (Google Fonts link, no npm dependency), one cobalt accent for NEAR's own refusals, links and focus; semantic colours only for verdicts. Signature: one "verdict stamp" style (mono code, status dot, hairline) for every decision on every page. Moment: the home page "Vault right now" ledger card with the live balance, counts, the 4 latest real decisions and the agent key's permission.
+**Changed**: `web/index.html` (dark mode, fonts), new `web/src/theme.css` (Bootstrap 5 variables + a few `ag-*` classes; no Tailwind), `components/{ui,Layout,Wallet}.jsx` (line icons as inline SVG, flat gate mark, quiet REAL/TESTNET strip, stamps, gauge), `pages/{Overview,Agents,Activity,Judge}.jsx` (split hero with the ledger card, ledger tables, judge path + gauge + Run all panel). Same routes, features, data and chain calls.
+**Checks**: `npm run build` OK · `vitest` 30/30 · headless Chromium 1440 px and iPhone 13: all pages render live data, no horizontal overflow, no page errors; J5 run from `/judge` shows the stamp and the green row marker.
+
 ### P1-b: Vault lock, script side (2026-11-11, after "go p1b")
 **Built**
 - `scripts/lib/lock.js` (pure, shared with the web): `lockStatus(keyList)` (locked = no FullAccess key), `lockProblems(...)` (refuses if already locked, if `get_owner` is unreadable / the vault itself / not the config owner, if the api-buyer key is missing or not limited to `request_spend` on the vault, or if the key on this machine is not one of the vault's full-access keys), `deleteOrder` (signing key last).

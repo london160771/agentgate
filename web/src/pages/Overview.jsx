@@ -1,91 +1,168 @@
 import { Link } from 'react-router-dom';
-import { formatNear } from '../../../scripts/lib/format.js';
-import { ChainView } from '../components/ui.jsx';
-import { accessKeysLink } from '../lib/links.js';
+import { formatNear, shortKey } from '../../../scripts/lib/format.js';
 import { lockStatus } from '../../../scripts/lib/lock.js';
+import { ChainView, Ext, Icon, Mono, StatusChip } from '../components/ui.jsx';
+import { accessKeysLink } from '../lib/links.js';
 import { cfg, vaultAccessKeys, viewVault } from '../lib/near.js';
 import { useChain } from '../lib/useChain.js';
 
-function Stat({ label, value, tone = 'body' }) {
+/** Live lock status (P1-b): locked = no full-access key on the vault account. */
+function LockLine() {
+  const keys = useChain(vaultAccessKeys);
+  if (keys.loading) return <span className="ag-label">Checking vault keys…</span>;
+  if (keys.error) return <span className="ag-label">Vault keys unavailable</span>;
+  const s = lockStatus(keys.data);
   return (
-    <div className="col-6 col-md-3">
-      <div className="border rounded p-3 h-100">
-        <div className="small text-secondary">{label}</div>
-        <div className={`fs-4 fw-semibold text-${tone}`}>{value}</div>
+    <a className="small d-inline-flex align-items-center gap-1 text-secondary text-decoration-none" href={accessKeysLink(cfg.vaultAccountId)} target="_blank" rel="noreferrer">
+      <Icon name={s.locked ? 'lock' : 'lockOpen'} size={14} />
+      {s.locked ? 'Locked: no full-access key' : `Not locked: ${s.fullAccess.length} full-access key`}
+    </a>
+  );
+}
+
+function Count({ label, value, kind, note }) {
+  return (
+    <div className="col-4">
+      <div className="ag-figure" style={{ fontSize: 24 }}>
+        {value}
+      </div>
+      <div className="mt-2">
+        <span className={`ag-stamp ag-stamp--${kind}`}>{label}</span>
+      </div>
+      {note && <div className="ag-label mt-1">{note}</div>}
+    </div>
+  );
+}
+
+/** The moment: the vault's real latest decisions, as a ledger card. */
+function LedgerCard() {
+  const stats = useChain(() => viewVault('get_stats'));
+  const latest = useChain(() => viewVault('get_payments', { from_index: 0, limit: cfg.logMax }).then((l) => [...l].reverse().slice(0, 4)));
+  return (
+    <div className="ag-ledger-card ag-enter-2">
+      <div className="ag-card-head">
+        <span className="fw-medium text-nowrap">Vault right now</span>
+        <LockLine />
+      </div>
+      <div className="ag-card-body">
+        <ChainView state={stats} what="Reading vault stats">
+          {(s) => (
+            <>
+              <div className="ag-label mb-2">Balance</div>
+              <div className="ag-figure mb-4">{formatNear(s.vault_balance)}</div>
+              <div className="row g-3 mb-3">
+                <Count label="PAID" value={s.paid} kind="paid" />
+                <Count label="HELD" value={s.held} kind="held" note={`${s.held_pending} waiting`} />
+                <Count label="BLOCKED" value={s.blocked} kind="blocked" />
+              </div>
+              <p className="ag-label mb-4">
+                {formatNear(s.total_paid)} paid by agents · {formatNear(s.total_approved)} approved by the owner · {s.total_requests} requests. NEAR’s own
+                refusals never reach the vault, so they aren’t counted here.
+              </p>
+            </>
+          )}
+        </ChainView>
+        <div className="ag-label mb-2">Latest decisions</div>
+        <div className="ag-raised px-3 py-3">
+          <ChainView state={latest} what="Reading the payment log">
+            {(list) =>
+              list.length === 0 ? (
+                <div className="small text-secondary">No payments yet</div>
+              ) : (
+                list.map((p) => (
+                  <div className="ag-receipt" key={p.id}>
+                    <StatusChip status={p.code} />
+                    <span className="font-monospace small text-nowrap">{formatNear(p.amount)}</span>
+                    <div className="small text-secondary text-truncate ag-receipt-reason">“{p.reason}”</div>
+                  </div>
+                ))
+              )
+            }
+          </ChainView>
+        </div>
+      </div>
+      <div className="ag-card-head flex-wrap" style={{ borderTop: '1px solid var(--ag-line)', borderBottom: 0 }}>
+        <span className="small text-secondary d-inline-flex align-items-center gap-2">
+          <Icon name="key" size={14} />
+          Agent key {shortKey(cfg.demoKeys.apiBuyerPublicKey)} can only call <code>request_spend</code>
+        </span>
+        <Ext href={accessKeysLink(cfg.vaultAccountId)} className="small">
+          Explorer
+        </Ext>
       </div>
     </div>
   );
 }
 
-/** Live lock status (P1-b): locked = no full-access key on the vault account. */
-function LockBadge() {
-  const keys = useChain(vaultAccessKeys);
-  if (keys.loading) return <span className="badge text-bg-light border p-2">Checking vault keys…</span>;
-  if (keys.error) return <span className="badge text-bg-warning p-2 text-wrap">Could not read the vault keys: {String(keys.error.message || keys.error)}</span>;
-  const s = lockStatus(keys.data);
-  return (
-    <a className={`badge p-2 text-wrap text-start ${s.locked ? 'text-bg-success' : 'text-bg-secondary'}`} href={accessKeysLink(cfg.vaultAccountId)} target="_blank" rel="noreferrer">
-      {s.locked
-        ? 'Vault locked: no full-access key. Not even the owner can move the NEAR outside the rules ↗'
-        : `Vault not locked yet: ${s.fullAccess.length} full-access key on the vault account ↗`}
-    </a>
-  );
-}
+const STEPS = [
+  ['Fund and mint', <>The owner funds the vault. The vault mints the agent’s key: a NEAR Function Call Key that can only call <code>request_spend</code>.</>],
+  ['The agent asks', <>Every payment is a request: <Mono>request_spend(to, amount, reason)</Mono>. The model never holds the money.</>],
+  ['The vault decides', <>Paid for an approved recipient inside the caps. Held for an unknown recipient. Blocked over a cap.</>],
+  ['NEAR guards the key', <>The key can’t send NEAR directly or call anything else, and the owner can revoke it in one transaction.</>],
+];
 
 export default function Overview() {
-  const stats = useChain(() => viewVault('get_stats'));
   return (
     <>
-      <section className="py-3">
-        <h1 className="display-6 fw-bold">The AI can be fooled. The money can’t.</h1>
-        <p className="lead">
-          AgentGate is a NEAR vault for AI agents. The agent gets a key that can only <em>ask</em> the vault to pay. The vault
-          decides: <strong>PAID</strong>, <strong>HELD</strong> or <strong>BLOCKED</strong>.
-        </p>
-        <p className="text-secondary mb-1">
-          <strong>Freysa (Nov 2024):</strong> after 482 tries, one message talked an AI agent into sending its whole prize pool.
-        </p>
-        <p className="text-secondary">
-          <strong>AIXBT (Mar 2025):</strong> an attacker queued two prompts on its dashboard and the agent sent 55.5 ETH. Same weak
-          point both times: the agent’s key was the money’s key.
-        </p>
-        <div className="d-flex flex-wrap gap-2 align-items-center">
-          <Link to="/judge" className="btn btn-primary btn-lg">
-            Try to break it →
-          </Link>
-          <a className="badge text-bg-light border text-wrap text-start p-2" href={accessKeysLink(cfg.vaultAccountId)} target="_blank" rel="noreferrer">
-            Agent key permission on the explorer: FunctionCall → {cfg.vaultAccountId}, method request_spend only ↗
-          </a>
-          <LockBadge />
+      <section className="ag-hero">
+        <div className="row g-5 align-items-center">
+          <div className="col-12 col-lg-6 ag-enter">
+            <h1>
+              The AI can be fooled.
+              <br />
+              The money can’t.
+            </h1>
+            <p className="ag-hero-sub">
+              AgentGate is a NEAR vault for AI agents. The agent’s key can only <em className="fst-normal text-body">ask</em> the vault to pay,
+              and the contract decides what money moves.
+            </p>
+            <div className="d-flex flex-wrap gap-3">
+              <Link to="/judge" className="btn btn-primary btn-lg d-inline-flex align-items-center gap-2">
+                Try to break it
+                <Icon name="arrowRight" />
+              </Link>
+              <Link to="/agents" className="btn btn-quiet btn-lg">
+                See the rules
+              </Link>
+            </div>
+          </div>
+          <div className="col-12 col-lg-6">
+            <LedgerCard />
+          </div>
         </div>
       </section>
 
-      <section className="py-3">
-        <h2 className="h5">Vault right now</h2>
-        <ChainView state={stats} what="Reading vault stats">
-          {(s) => (
-            <div className="row g-3">
-              <Stat label="Vault balance" value={formatNear(s.vault_balance)} />
-              <Stat label="Paid" value={s.paid} tone="success" />
-              <Stat label={`Held (${s.held_pending} waiting)`} value={s.held} tone="warning" />
-              <Stat label="Blocked" value={s.blocked} tone="danger" />
-              <div className="col-12 small text-secondary">
-                Total paid by agents {formatNear(s.total_paid)} · approved by owner {formatNear(s.total_approved)} · {s.total_requests}{' '}
-                requests since deploy. Refusals by NEAR itself (leaked or revoked key) never reach the vault, so they are not counted here.
-              </div>
+      <section className="ag-section">
+        <h2 className="ag-section-title">The weak point it removes</h2>
+        <p className="ag-section-sub">In both cases the agent’s key was the money’s key, so whoever steered the agent’s words also moved the money.</p>
+        <div className="row g-3">
+          <div className="col-12 col-md-6">
+            <div className="ag-panel ag-panel-pad h-100">
+              <div className="ag-label mb-2 font-monospace">Freysa · Nov 2024</div>
+              <p className="mb-0">After 482 tries, one message talked an AI agent into sending its whole prize pool.</p>
             </div>
-          )}
-        </ChainView>
+          </div>
+          <div className="col-12 col-md-6">
+            <div className="ag-panel ag-panel-pad h-100">
+              <div className="ag-label mb-2 font-monospace">AIXBT · Mar 2025</div>
+              <p className="mb-0">An attacker queued two prompts on its dashboard and the agent sent 55.5 ETH.</p>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <section className="py-3">
-        <h2 className="h5">How it works</h2>
-        <ol className="mb-0">
-          <li>The owner funds the vault. The vault mints the agent’s key: a NEAR Function Call Key that can only call <code>request_spend</code>.</li>
-          <li>The agent asks: <code>request_spend(to, amount, reason)</code>.</li>
-          <li>The vault decides: <strong>PAID</strong> (approved recipient, inside caps), <strong>HELD</strong> (unknown recipient, owner decides), <strong>BLOCKED</strong> (over a cap).</li>
-          <li>NEAR itself stops the key from sending NEAR directly or calling anything else. The owner can revoke it in one transaction.</li>
-        </ol>
+      <section className="ag-section">
+        <h2 className="ag-section-title">How it works</h2>
+        <p className="ag-section-sub">Three of these rules live in the vault contract. The last one is enforced by the NEAR protocol itself.</p>
+        <div className="row g-4">
+          {STEPS.map(([title, text], i) => (
+            <div className="col-12 col-sm-6 col-lg-3" key={title}>
+              <div className="ag-step-num mb-2">{String(i + 1).padStart(2, '0')}</div>
+              <div className="fw-medium mb-1">{title}</div>
+              <p className="small text-secondary mb-0">{text}</p>
+            </div>
+          ))}
+        </div>
       </section>
     </>
   );

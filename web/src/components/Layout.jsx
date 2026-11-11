@@ -1,48 +1,55 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { cfg, configProblems, isReady } from '../lib/near.js';
 import { accountLink } from '../lib/links.js';
+import { Mark } from './ui.jsx';
 import { WalletControl, WalletNotice } from './Wallet.jsx';
 
 const NAV = [
   ['/', 'Overview'],
-  ['/agents', 'Agents & Rules'],
+  ['/agents', 'Agents and rules'],
   ['/activity', 'Activity'],
-  ['/judge', 'Attack Lab'],
+  ['/judge', 'Attack lab'],
 ];
 
 export default function Layout() {
   return (
     <>
-      <div className="bg-warning text-dark small py-1 text-center fw-semibold">
-        REAL · NEAR TESTNET · every number below is read live from{' '}
-        <a className="text-dark" href={accountLink(cfg.vaultAccountId)} target="_blank" rel="noreferrer">
-          {cfg.vaultAccountId}
-        </a>
+      <div className="ag-strip">
+        <div className="container d-flex flex-wrap align-items-center gap-2">
+          <span className="ag-dot" aria-hidden="true" />
+          <span>
+            Real transactions on NEAR testnet. Every number is read live from{' '}
+            <a className="font-monospace" href={accountLink(cfg.vaultAccountId)} target="_blank" rel="noreferrer">
+              {cfg.vaultAccountId}
+            </a>
+          </span>
+        </div>
       </div>
-      <nav className="navbar navbar-expand bg-dark" data-bs-theme="dark">
-        <div className="container flex-wrap">
-          <NavLink className="navbar-brand fw-bold" to="/">
+      <nav className="ag-nav">
+        <div className="container">
+          <NavLink className="ag-brand" to="/">
+            <Mark />
             AgentGate
           </NavLink>
-          <ul className="navbar-nav flex-wrap">
+          <ul className="ag-links">
             {NAV.map(([to, label]) => (
-              <li className="nav-item" key={to}>
-                <NavLink className="nav-link" to={to} end={to === '/'}>
+              <li key={to}>
+                <NavLink to={to} end={to === '/'}>
                   {label}
                 </NavLink>
               </li>
             ))}
           </ul>
-          <div className="ms-md-auto py-1">
+          <div className="ag-nav-end">
             <WalletControl />
           </div>
         </div>
       </nav>
-      <main className="container py-4">
+      <main className="container">
         {!isReady && (
-          <div className="alert alert-danger">
-            <div className="fw-semibold">config/seed.json is not ready for the web app:</div>
-            <ul className="mb-0">
+          <div className="ag-panel ag-panel-pad mt-4">
+            <div className="fw-medium">config/seed.json is not ready for the web app</div>
+            <ul className="mb-0 small text-secondary">
               {configProblems.map((p) => (
                 <li key={p}>{p}</li>
               ))}
@@ -52,11 +59,13 @@ export default function Layout() {
         <WalletNotice />
         <Outlet />
       </main>
-      <footer className="container pb-4 small text-secondary">
-        Built at NEAR HACKATHON · testnet only · no backend, no signup ·{' '}
-        <a href="https://github.com/london160771/agentgate" target="_blank" rel="noreferrer">
-          source
-        </a>
+      <footer className="ag-footer">
+        <div className="container d-flex flex-wrap gap-2 justify-content-between">
+          <span>Built at NEAR HACKATHON · testnet only · no backend, no signup</span>
+          <a href="https://github.com/london160771/agentgate" target="_blank" rel="noreferrer">
+            Source on GitHub
+          </a>
+        </div>
       </footer>
     </>
   );
