@@ -13,10 +13,10 @@ function LockLine() {
   if (keys.error) return <span className="ag-label">Vault keys unavailable</span>;
   const s = lockStatus(keys.data);
   return (
-    <a className="small d-inline-flex align-items-center gap-1 text-secondary text-decoration-none" href={accessKeysLink(cfg.vaultAccountId)} target="_blank" rel="noreferrer">
+    <Link className="small d-inline-flex align-items-center gap-1 text-secondary" to="/verify" title="Verify this vault">
       <Icon name={s.locked ? 'lock' : 'lockOpen'} size={14} />
-      {s.locked ? 'Locked: no full-access key' : `Not locked: ${s.fullAccess.length} full-access key`}
-    </a>
+      {s.locked ? 'Locked: no full-access key' : `Not locked: ${s.fullAccess.length} full-access key`} · Verify
+    </Link>
   );
 }
 

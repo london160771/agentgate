@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Ext, Mono, PageHead } from '../components/ui.jsx';
 import { accessKeysLink, accountLink } from '../lib/links.js';
 import { cfg } from '../lib/near.js';
+import { MCP_PACKAGE } from '../lib/factory.js';
 
 const REPO = 'https://github.com/london160771/agentgate';
 const file = (path) => `${REPO}/blob/main/${path}`;
@@ -47,6 +48,7 @@ const SECTIONS = [
   ['demo', 'The demo vault'],
   ['judges', 'Try to break it'],
   ['owners', 'For vault owners'],
+  ['mcp', 'Use it from Claude or Cursor'],
   ['developers', 'For developers'],
   ['contract', 'Contract methods'],
   ['security', 'Security model and limits'],
@@ -202,6 +204,7 @@ export default function Docs() {
               <li>Press <strong>Run all</strong>. Each of the 7 attacks signs a real testnet transaction in your browser with the public agent key.</li>
               <li>Read each row: what should happen, what did happen, and the proof (an explorer link or NEAR’s own refusal).</li>
               <li>Watch the meter. Today’s total never goes past the daily cap, however often you run the salami attack.</li>
+              <li>Open <Link to="/verify">Verify</Link>: the vault has no full-access key and its only key is limited to <Mono>request_spend</Mono>, read live from RPC.</li>
             </ol>
             <p className="mb-0">
               The key is also on the <Link to="/agents">Agents</Link> page. Use it any way you like. Every decision shows up on <Link to="/activity">Activity</Link>.
@@ -216,6 +219,26 @@ export default function Docs() {
             </ol>
             <p className="mb-0 small text-secondary">
               Anyone else who signs in sees no buttons, and the contract refuses non-owners anyway (<Mono>ERR_NOT_OWNER</Mono>).
+            </p>
+          </Section>
+
+          <Section id="mcp">
+            <p>
+              The AgentGate MCP server gives Claude, Cursor or any MCP agent three tools: <Mono>budget</Mono> (its caps and what is left today), <Mono>pay</Mono> (asks the vault
+              with <Mono>request_spend</Mono>) and <Mono>history</Mono> (its log). It holds only the agent key, so the vault decides every payment.
+            </p>
+            <pre className="ag-doc-code">{`# Claude Code, with the public demo key
+claude mcp add agentgate -- npx -y ${MCP_PACKAGE} --demo
+
+# Your own vault: the key from "Add an agent"
+claude mcp add agentgate -e AGENTGATE_VAULT=<vault id> -e AGENTGATE_AGENT_KEY=ed25519:... -- npx -y ${MCP_PACKAGE}
+
+# Claude Desktop / Cursor: mcpServers in claude_desktop_config.json or .cursor/mcp.json
+"agentgate": { "command": "npx", "args": ["-y", "${MCP_PACKAGE}"],
+  "env": { "AGENTGATE_VAULT": "<vault id>", "AGENTGATE_AGENT_KEY": "ed25519:..." } }`}</pre>
+            <p className="mb-0">
+              Then ask: “Check your budget, then pay 0.01 NEAR to {cfg.recipients.hacker}.” That account isn’t approved, so the vault answers HELD and nothing moves until the owner decides.
+              Source: <Ext href={file('scripts/mcp-server.js')}>scripts/mcp-server.js</Ext>.
             </p>
           </Section>
 

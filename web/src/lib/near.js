@@ -38,6 +38,9 @@ export const viewFactory = (method, args = {}) => viewAt(cfg.factoryAccountId, m
 /** Any account's access-key list (lock status: locked = no full-access key). */
 export const accessKeysOf = (accountId) => withFallback('access keys', (p) => new Account(accountId, p).getAccessKeyList());
 
+/** view_account of any account (code_hash: which code it runs). */
+export const viewAccountOf = (accountId) => withFallback('account', (p) => p.viewAccount({ accountId }));
+
 /** View call on the demo vault, trying each RPC until one answers. */
 export const viewVault = (method, args = {}) => withFallback(method, (p) => view(p, cfg.vaultAccountId, method, args));
 

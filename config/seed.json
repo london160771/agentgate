@@ -3,6 +3,7 @@
   "ownerAccountId": "agentgate-ayo.testnet",
   "vaultAccountId": "vault.<owner>.testnet",
   "factoryAccountId": "agentgate.testnet",
+  "siteUrl": "https://agentgate-near.vercel.app",
   "recipients": {
     "apiProvider": "api-provider.<owner>.testnet",
     "dataProvider": "data-provider.<owner>.testnet",

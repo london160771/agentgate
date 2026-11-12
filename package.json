@@ -1,0 +1,23 @@
+{
+  "name": "agentgate-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AgentGate MCP server: budget / pay / history tools for any MCP agent, enforced by your NEAR vault contract. Run: npx -y github:london160771/agentgate --demo",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "agentgate-mcp": "scripts/mcp-server.js"
+  },
+  "files": [
+    "scripts/mcp-server.js",
+    "scripts/lib/",
+    "config/seed.json"
+  ],
+  "engines": {
+    "node": ">=22.22.2"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "near-api-js": "^7.5.2"
+  }
+}

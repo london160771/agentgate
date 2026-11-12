@@ -8,8 +8,8 @@ import { isAccountId } from '../../../scripts/lib/config.js';
 import { lockStatus } from '../../../scripts/lib/lock.js';
 import { CapMeter, ChainView, Ext, Icon, Mono, PageHead, StatusChip } from '../components/ui.jsx';
 import { OwnerButton, useWallet, WalletControl } from '../components/Wallet.jsx';
-import { addAgentArgs, agentSnippet } from '../lib/factory.js';
-import { accessKeysLink, accountLink, nsToDate, txLink } from '../lib/links.js';
+import { addAgentArgs, agentSnippet, mcpSnippet } from '../lib/factory.js';
+import { accountLink, nsToDate, txLink } from '../lib/links.js';
 import { accessKeysOf, viewAt } from '../lib/near.js';
 import { outcomeFailure, outcomeHash } from '../lib/owner.js';
 import { useChain } from '../lib/useChain.js';
@@ -48,9 +48,10 @@ function Dashboard({ vaultId }) {
       <PageHead
         title={vaultId.split('.')[0]}
         aside={
-          <Ext href={accountLink(vaultId)} className="small">
-            Explorer
-          </Ext>
+          <div className="d-flex gap-3 small">
+            <Link to={`/verify/${vaultId}`}>Verify this vault</Link>
+            <Ext href={accountLink(vaultId)}>Explorer</Ext>
+          </div>
         }
       >
         <Mono>{vaultId}</Mono> · owner <Mono>{owner.data || '…'}</Mono> {mine && <span className="ag-stamp ag-stamp--paid ms-1">you</span>}
@@ -131,10 +132,10 @@ function LockBadge({ vaultId }) {
   if (!keys.data) return null;
   const s = lockStatus(keys.data);
   return (
-    <a className="small d-inline-flex align-items-center gap-1 text-secondary text-decoration-none" href={accessKeysLink(vaultId)} target="_blank" rel="noreferrer">
+    <Link className="small d-inline-flex align-items-center gap-1 text-secondary" to={`/verify/${vaultId}`} title="Verify this vault">
       <Icon name={s.locked ? 'lock' : 'lockOpen'} size={14} />
-      {s.locked ? 'Locked: no full-access key' : `Not locked: ${s.fullAccess.length} full-access key`}
-    </a>
+      {s.locked ? 'Locked: no full-access key' : `Not locked: ${s.fullAccess.length} full-access key`} · Verify
+    </Link>
   );
 }
 
@@ -342,9 +343,14 @@ function AddAgent({ vaultId, onDone }) {
 }
 
 function NewKey({ vaultId, created, onClose }) {
-  const snippet = agentSnippet({ vaultId, privateKey: created.privateKey });
+  const [tab, setTab] = useState('mcp');
+  const snippet = (tab === 'mcp' ? mcpSnippet : agentSnippet)({ vaultId, privateKey: created.privateKey });
   const [copied, setCopied] = useState(false);
   const copy = () => navigator.clipboard?.writeText(snippet).then(() => setCopied(true), () => setCopied(false));
+  const pick = (t) => {
+    setTab(t);
+    setCopied(false);
+  };
   return (
     <div className="ag-panel ag-panel-pad mb-3 ag-newkey" role="status">
       <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-1">
@@ -356,6 +362,18 @@ function NewKey({ vaultId, created, onClose }) {
       <p className="small text-secondary mb-3">
         This is the only time the private key is shown. AgentGate doesn’t store it. Give it to your agent like an API key. If it leaks, the worst case is the caps you set, and you can revoke it here.
       </p>
+      <ul className="nav nav-pills nav-sm gap-1 mb-2" role="tablist">
+        {[
+          ['mcp', 'Claude / Cursor (MCP)'],
+          ['code', 'Your own code'],
+        ].map(([id, label]) => (
+          <li className="nav-item" key={id}>
+            <button type="button" role="tab" aria-selected={tab === id} className={`nav-link py-1 px-2 small ${tab === id ? 'active' : ''}`} onClick={() => pick(id)}>
+              {label}
+            </button>
+          </li>
+        ))}
+      </ul>
       <pre className="ag-doc-code mb-3">{snippet}</pre>
       <div className="d-flex gap-2">
         <button className="btn btn-primary" onClick={copy}>{copied ? 'Copied' : 'Copy setup'}</button>

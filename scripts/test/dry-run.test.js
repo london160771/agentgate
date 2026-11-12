@@ -24,6 +24,7 @@ const RUNS = [
   ['node', ['scripts/agent.js', '--dry-run']],
   ['node', ['scripts/agent.js', '--mode=llm', '--dry-run']],
   ['node', ['scripts/try-agent.js', '--dry-run']],
+  ['node', ['scripts/mcp-server.js', '--dry-run']],
   ['bash', ['scripts/deploy.sh', '--dry-run']],
   ['bash', ['scripts/deploy-factory.sh', '--dry-run']],
 ];

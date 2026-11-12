@@ -94,6 +94,30 @@ const result = await agent.callFunction({
 console.log(result); // { status: 'PAID' | 'HELD' | 'BLOCKED', code, payment_id, ... }`;
 }
 
+/** npx spec for the AgentGate MCP server (root package.json of the repo). */
+export const MCP_PACKAGE = 'github:london160771/agentgate';
+
+/** Setup for MCP agents (Claude Code, Claude Desktop, Cursor): budget / pay / history tools. */
+export function mcpSnippet({ vaultId, privateKey }) {
+  const config = {
+    mcpServers: {
+      agentgate: {
+        command: 'npx',
+        args: ['-y', MCP_PACKAGE],
+        env: { AGENTGATE_VAULT: vaultId, AGENTGATE_AGENT_KEY: privateKey },
+      },
+    },
+  };
+  return `# AgentGate for Claude, Cursor or any MCP agent. Keep the key secret like an API key.
+# Your agent gets 3 tools: budget, pay, history. The vault decides every payment.
+
+# Claude Code: one command
+claude mcp add agentgate -e AGENTGATE_VAULT=${vaultId} -e AGENTGATE_AGENT_KEY=${privateKey} -- npx -y ${MCP_PACKAGE}
+
+# Claude Desktop (claude_desktop_config.json) or Cursor (.cursor/mcp.json)
+${JSON.stringify(config, null, 2)}`;
+}
+
 /** create_vault returns on_vault_created's bool: true = created. Reads it from the outcome. */
 export function createdFromOutcome(outcome) {
   const v = outcome?.status?.SuccessValue;

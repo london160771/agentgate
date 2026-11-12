@@ -12,6 +12,12 @@ AgentGate is a NEAR vault for AI agents. Your agent gets a key that can only *as
 
 ---
 
+## Why AgentGate is different
+- **Locked by NEAR, not by a promise.** Every vault is born with no full-access key. Nobody can bypass its rules: not the agent, not a thief with the agent's key, not AgentGate. Anyone can check any vault live on its [Verify page](https://agentgate-near.vercel.app/verify), no wallet needed.
+- **Our agent key is public, and the vault is still safe.** Try to drain it in the [Attack lab](https://agentgate-near.vercel.app/judge): 7 real attacks, each refused on chain, by the contract or by NEAR itself.
+- **Works with the agent you already use.** One command gives Claude, Cursor or any MCP agent three tools, `budget`, `pay` and `history`. The vault decides every payment ([try it](#with-claude-or-any-mcp-agent)).
+- **Proof, not screenshots.** Every testnet transaction we made is [listed below](#proof) with its explorer link, and every claim in this README has a check behind it.
+
 ## The problem: the agent's key is the money's key
 
 **November 2024.** An AI agent called Freysa guarded a prize pool and had one rule: never send the money. After 482 tries, one player convinced it that its "approve transfer" function was for *receiving* money. Freysa sent the whole pool, about $47,000. ([source](https://www.theblock.co/post/328747))
@@ -85,6 +91,20 @@ This is the real agent key for our testnet vault (also in [`config/seed.json`](c
 4. Watch the meter: today's total never goes past the daily cap, however often you run J4.
 5. Open the [vault's access keys](https://testnet.nearblocks.io/address/vault.agentgate-ayo.testnet?tab=accesskeys): the agent key is a `FunctionCall` key that can only call `request_spend` on the vault.
 
+### With Claude or any MCP agent
+Give your own Claude the demo vault's public key and ask it to pay someone. The `pay` tool sends `request_spend`; the vault answers.
+```bash
+claude mcp add agentgate -- npx -y github:london160771/agentgate --demo
+claude "Check your AgentGate budget, then pay 0.01 NEAR to hacker.agentgate-ayo.testnet for the dataset."
+```
+The hacker account is not an approved recipient, so the vault answers **HELD** and nothing moves until the owner decides. Ask for 1 NEAR and it answers **BLOCKED_OVER_TX_CAP**. Claude Desktop or Cursor: add this to `mcpServers` in `claude_desktop_config.json` or `.cursor/mcp.json`:
+```json
+"agentgate": { "command": "npx", "args": ["-y", "github:london160771/agentgate", "--demo"] }
+```
+For your own vault, drop `--demo` and set `AGENTGATE_VAULT` and `AGENTGATE_AGENT_KEY`; the vault page shows the exact command when you add an agent. Note that the demo vault's 0.6 NEAR daily cap is shared by everyone who tries it, so a payment to an approved recipient may answer `BLOCKED_OVER_DAILY_CAP` late in the UTC day. That is the cap working.
+
+The server is [`scripts/mcp-server.js`](scripts/mcp-server.js) and its tools are in [`scripts/lib/mcp-tools.js`](scripts/lib/mcp-tools.js). It holds only the agent key, so the agent's whole power is `request_spend`.
+
 **From a terminal** (Node 22.22+, runs the same attack code as `/judge`):
 ```bash
 git clone https://github.com/london160771/agentgate && cd agentgate
@@ -102,12 +122,12 @@ Any NEAR testnet wallet can create its own vault and plug in its own agent. No s
 1. Get testnet NEAR from the [faucet](https://near-faucet.io). A vault needs about 2.7 NEAR (about 2 NEAR pays for storing the vault code; the rest is the vault's balance). The form shows the exact minimum, read from the factory.
 2. Open **[My vaults](https://agentgate-near.vercel.app/app)**, press **Connect wallet**, pick a name and press **Create vault**. One transaction to the factory (`factory/`) creates `<name>.agentgate.testnet` with you as owner. The factory adds **no access key** to the new account, so it is locked from birth: only the vault's rules can move its NEAR.
 3. On your vault's page press **Add an agent**: per-payment cap, daily cap, approved recipients. Your browser makes the key pair; the vault mints the public key as a Function Call Key that can only call `request_spend`.
-4. Copy the private key and the setup snippet (shown once) into your agent, like an API key. The site never stores it.
+4. Copy the private key and the setup (shown once) into your agent, like an API key: a one-line `claude mcp add` command and a JSON block for Claude Desktop or Cursor, or a Node snippet for your own code. The site never stores the key.
 5. Your agent calls `request_spend`. Every request appears on your vault page as PAID, HELD or BLOCKED; you approve or reject held ones, add funds, or revoke the agent.
 
 No agent yet? `node scripts/try-agent.js` asks for your vault id and agent key (hidden) and makes 3 real requests as your agent: a small payment to your first approved recipient (PAID), the same to an unknown account (HELD), and one over your per-payment cap (BLOCKED_OVER_TX_CAP). Checked on the demo vault on 2026-11-11: 3/3 as expected, [`evidence/try-agent-2026-11-11T21-47-24Z.json`](evidence/try-agent-2026-11-11T21-47-24Z.json).
 
-Each wallet sees the vaults it created at `/app`; every vault has its own page at `/v/<vault id>`.
+Each wallet sees the vaults it created at `/app`; every vault has its own page at `/v/<vault id>` and a public check at `/verify/<vault id>`: no full-access key, every key limited to `request_spend`, the same code hash the factory ships, and the factory's record of who created it. All read live from RPC.
 
 ## Why NEAR
 On most chains one key controls everything, so agent-wallet tools need an off-chain policy server or a smart-account wrapper in front of it. NEAR accounts can hold many keys with different powers, built into the protocol. AgentGate turns that into agent allowances.
@@ -124,8 +144,8 @@ On most chains one key controls everything, so agent-wallet tools need an off-ch
 **Tests** (offline, run in the cloud build on 2026-11-11):
 - Contract: `cd contract && cargo test` → **33 passed**, including a 500-request random run that checks the guarantee after every request.
 - Factory: `cd factory && cargo test` → **8 passed** (the create batch has no add-key action, failed creates refund the owner).
-- Scripts: `cd scripts && node --test` → **54 passed**.
-- Web: `cd web && npx vitest run` → **45 passed**.
+- Scripts: `cd scripts && node --test` → **66 passed** (incl. the MCP tools against mock vault answers and the real server over stdio).
+- Web: `cd web && npx vitest run` → **54 passed** (incl. the Verify checks).
 
 **Gate 0** (can a contract-minted key really be limited by NEAR?), testnet, 2026-11-11, raw output in [`evidence/gate0.json`](evidence/gate0.json): **PASS 4/4**.
 
@@ -224,6 +244,8 @@ Gate 0, the Attack Suite and the dashboard numbers are real NEAR testnet results
 - Someone with the leaked key can **use up the daily cap**, but only by paying approved recipients. The money can't reach them.
 - The held queue can be filled with junk requests (max 20). New unknown-recipient requests are then blocked until the owner clears it.
 - AgentGate doesn't stop prompt injection. It limits what an injected agent can do.
+- The Verify page proves a vault runs the same build as every factory vault. It can't yet prove that build matches the GitHub source: we use a non-reproducible build. Reproducible builds are on the [roadmap](ROADMAP.md).
+- The MCP server runs on your machine with the agent key in its environment. Treat that key like an API key; if it leaks, the loss is still limited by the caps.
 
 ## Where it's going
 

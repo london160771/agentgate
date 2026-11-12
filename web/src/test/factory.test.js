@@ -1,7 +1,7 @@
 // Unit tests for the multi-user helpers. No wallet, no network.
 import { describe, expect, it } from 'vitest';
 import { actionCreators } from '@near-wallet-selector/core';
-import { addAgentArgs, agentSnippet, createdFromOutcome, createVaultAction, GAS_CREATE_VAULT, parseRecipients, validVaultName, vaultIdFor } from '../lib/factory.js';
+import { addAgentArgs, agentSnippet, mcpSnippet, createdFromOutcome, createVaultAction, GAS_CREATE_VAULT, parseRecipients, validVaultName, vaultIdFor } from '../lib/factory.js';
 
 describe('validVaultName (same rules as the factory contract)', () => {
   it('accepts simple lowercase names', () => {
@@ -61,6 +61,15 @@ describe('agentSnippet', () => {
     expect(s).toContain('AGENTGATE_VAULT=alice.factory.ade.testnet');
     expect(s).toContain('AGENTGATE_AGENT_KEY=ed25519:SECRET');
     expect(s).toContain("methodName: 'request_spend'");
+  });
+});
+
+describe('mcpSnippet', () => {
+  it('gives Claude Code and JSON config with the vault and key', () => {
+    const s = mcpSnippet({ vaultId: 'alice.factory.ade.testnet', privateKey: 'ed25519:SECRET' });
+    expect(s).toContain('claude mcp add agentgate -e AGENTGATE_VAULT=alice.factory.ade.testnet -e AGENTGATE_AGENT_KEY=ed25519:SECRET -- npx -y github:london160771/agentgate');
+    const json = JSON.parse(s.slice(s.indexOf('{')));
+    expect(json.mcpServers.agentgate.env).toEqual({ AGENTGATE_VAULT: 'alice.factory.ade.testnet', AGENTGATE_AGENT_KEY: 'ed25519:SECRET' });
   });
 });
 

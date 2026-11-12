@@ -12,6 +12,7 @@ import MyVaults from './pages/MyVaults.jsx';
 import VaultDashboard from './pages/VaultDashboard.jsx';
 import Judge from './pages/Judge.jsx';
 import Overview from './pages/Overview.jsx';
+import Verify from './pages/Verify.jsx';
 
 function NotFound() {
   return <p>Page not found.</p>;
@@ -30,6 +31,8 @@ createRoot(document.getElementById('root')).render(
             <Route path="docs" element={<Docs />} />
             <Route path="app" element={<MyVaults />} />
             <Route path="v/:vaultId" element={<VaultDashboard />} />
+            <Route path="verify" element={<Verify />} />
+            <Route path="verify/:vaultId" element={<Verify />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

@@ -13,6 +13,12 @@ Ideas that are **not** in the hackathon build. The hackathon build is the first 
 ## Vision: Agent Passport (was P1-c)
 Only agents running approved code inside a TEE (NEAR Shade Agents attestation, e.g. on Phala Cloud) can be given a key. A copied key or a modified agent gets nothing, and users can check which agent code handles their money. This closes the last gap of the hackathon build: today a leaked key can still spend inside its caps.
 
+## Built for the submission (12 Nov, at Adesope's request)
+- ~~MCP connector: `npx -y github:london160771/agentgate` gives any MCP agent `budget` / `pay` / `history` tools.~~ Built.
+- ~~Verify page `/verify/<vault>`: lock, key permissions, code hash vs factory, factory record.~~ Built.
+- Later: publish the MCP server to npm as `agentgate-mcp` (needs Adesope's npm account).
+- Later: reproducible contract builds (`cargo near build reproducible-wasm`) so the Verify page can match the code hash to the GitHub source.
+
 ## Later, small
 - Real LLM agent by default, via NEAR AI Cloud (today `node scripts/agent.js --mode=llm` is written for any OpenAI-compatible endpoint but has not been run against one).
 - Store the tx hash or block height per payment, so `/activity` can link each row to its own transaction (today it links the vault's explorer page).
