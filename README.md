@@ -9,6 +9,7 @@ AgentGate is a NEAR vault for AI agents. Your agent gets a key that can only *as
 > Built at **NEAR HACKATHON** (1–14 Nov 2026) · Tracks: AI Security & Defense, Agent Economy · Network: NEAR testnet
 > 🔗 Live demo: [agentgate-near.vercel.app](https://agentgate-near.vercel.app) · 🎥 Video + 𝕏 post: [x.com/ayyoweb3/status/2120943850826912013](https://x.com/ayyoweb3/status/2120943850826912013)
 > Vault on testnet: [`vault.agentgate-ayo.testnet`](https://testnet.nearblocks.io/address/vault.agentgate-ayo.testnet) · [its access keys](https://testnet.nearblocks.io/address/vault.agentgate-ayo.testnet?tab=accesskeys)
+> Sister project by the same builder: **[Headroom](https://github.com/london160771/headroom)**, a re-runnable census of NEAR's blockspace (Investment Thesis track).
 
 ---
 
