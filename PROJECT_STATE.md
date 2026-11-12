@@ -41,6 +41,11 @@ P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
 
 ## Log
 
+### Logo + every testnet transaction in the README (2026-11-12, Adesope asked, for the demo video)
+- Logo: a gate with a keyhole on the cobalt accent (`web/public/favicon.svg`), used as the navbar mark (`Mark` in `ui.jsx`, 24 px), the favicon, an `apple-touch-icon.png` (180 px, rendered from the SVG) and at the top of the README. Commit abb174b.
+- README Proof: new "Every testnet transaction so far" list (40 transactions, all succeeded), fetched from the NearBlocks testnet API v3 for `agentgate-ayo.testnet`, `vault.agentgate-ayo.testnet`, `agentgate.testnet`, `ayo-funds-1.testnet`. The 23 `request_spend` transactions line up one-to-one with the vault's `get_payments` log (ids 0–22, same block timestamps), so each row shows the vault's decision. Raw data: `evidence/transactions-2026-11-12.json`.
+**Checks**: `vitest` 45/45 · build OK · headless Chromium: `/favicon.svg` served as `image/svg+xml`, both icon links in the page, navbar logo renders.
+
 ### scripts/try-agent.js: test your own agent key (2026-11-11, for the demo video)
 Adesope asked what to record; the video shows creating a vault, adding an agent, and that agent spending. New `scripts/try-agent.js`: asks for the vault id and the agent key (input hidden, or `AGENTGATE_VAULT` / `AGENTGATE_AGENT_KEY`), reads the agent's own rules with `get_agent`, then sends 3 `request_spend` calls: J1's small amount (from `scripts/lib/attacks.js`) to the first approved recipient → PAID; same to `recipients.hacker` → HELD; per-payment cap + 0.01 NEAR → BLOCKED_OVER_TX_CAP. Writes `evidence/try-agent-<time>.json` (public key only, no private key). Files: `scripts/try-agent.js`, `scripts/test/dry-run.test.js`, `README.md`, `web/src/pages/Docs.jsx`, `evidence/try-agent-2026-11-11T21-47-24Z.json`.
 **Checks**: `node --test` 55/55 (new dry-run test) · real run on the demo vault with the public api-buyer key: PAID `8ekLCXA7…`, HELD `CHBDmynK…`, BLOCKED_OVER_TX_CAP `2mWH6ebK…` (3/3 as expected; the held one now waits on the demo vault) · in a pseudo-terminal the key prompt does not echo the pasted key.
