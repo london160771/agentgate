@@ -41,6 +41,13 @@ P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
 
 ## Log
 
+### Demo video + multi-user checked live end to end (2026-11-12)
+- Adesope created `ayo-agents.agentgate.testnet` from the website with Meteor (`create_vault` on the factory) and added agent `research-bot` from the browser (`add_agent`). First real use of the multi-user flow: both succeeded on chain.
+- `node scripts/try-agent.js` with that key on `ayo-agents`: PAID `FDgkq2em…`, HELD `3oWFrgMK…`, BLOCKED_OVER_TX_CAP `AbVHJ8gV…` (3/3), `evidence/try-agent-2026-11-12T12-10-08Z.json`. RPC `view_access_key_list` on `ayo-agents` shows exactly one key: FunctionCall, `request_spend` only (no full-access key).
+- Live Attack Lab run on the site for the video: 7/7 as expected.
+- Demo video (1:57) assembled from Adesope's clip + recorded terminal/site segments + his ElevenLabs voiceover: `/mnt/project-files/demo/agentgate-demo.mp4` (not in the repo).
+- README transaction list regenerated: 53 transactions, all succeeded.
+
 ### Logo + every testnet transaction in the README (2026-11-12, Adesope asked, for the demo video)
 - Logo: a gate with a keyhole on the cobalt accent (`web/public/favicon.svg`), used as the navbar mark (`Mark` in `ui.jsx`, 24 px), the favicon, an `apple-touch-icon.png` (180 px, rendered from the SVG) and at the top of the README. Commit abb174b.
 - README Proof: new "Every testnet transaction so far" list (40 transactions, all succeeded), fetched from the NearBlocks testnet API v3 for `agentgate-ayo.testnet`, `vault.agentgate-ayo.testnet`, `agentgate.testnet`, `ayo-funds-1.testnet`. The 23 `request_spend` transactions line up one-to-one with the vault's `get_payments` log (ids 0–22, same block timestamps), so each row shows the vault's decision. Raw data: `evidence/transactions-2026-11-12.json`.
