@@ -30,6 +30,7 @@ P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
 | ⛔ B. Launch (Adesope) | **active** | | checklist at the top |
 | P1-b. Vault lock | done: script 638903e, lock run by Adesope 2026-11-11 18:17 UTC | 638903e | `node --test` 53/53 · dry run OK · live pre-check refuses a wrong key |
 | Multi-user v1 (factory + per-wallet dashboards) | built; factory deploy by Adesope | see log | factory `cargo test` 8/8 · `node --test` 54/54 · `vitest` 45/45 · build OK |
+| Stand-out: MCP connector + Verify page (Adesope picked it, 12 Nov) | done | 72e7482 + docs commit | `node --test` 66/66 · `vitest` 54/54 · build OK · real Claude via MCP → HELD on chain |
 | P1-a. Owner actions in UI | done (wallet now Meteor) | 549a60d | `vitest` 29/29 · build OK · wallet flow checked up to the MyNearWallet sign page; Meteor login pop-up checked |
 
 ## Known facts
@@ -40,6 +41,22 @@ P0 build is done (Phases 1–4). The agent does not deploy. Do these in order:
 - near-sdk 5.30.1 refuses a plain native `cargo clippy` (it emits a compile_error telling you to use cargo-near). Working lint commands: `cargo clippy --all-targets -- -D warnings` (native, includes tests) and `cargo clippy --target wasm32-unknown-unknown -- -D warnings`.
 
 ## Log
+
+### MCP connector + Verify page (2026-11-12, Adesope chose "MCP connector + Verify page" to stand out)
+- **MCP server** `scripts/mcp-server.js` (+ pure tools in `scripts/lib/mcp-tools.js`): stdio MCP server with 3 tools. `budget` reads `get_agent` + `get_stats`; `pay(to, amount_near, reason)` sends `request_spend` signed with the agent key and explains PAID / HELD / BLOCKED / NEAR refusals in words an agent can act on; `history` filters `get_payments` to this agent. Config: `AGENTGATE_VAULT` + `AGENTGATE_AGENT_KEY`, or `--demo` (public api-buyer key from `config/seed.json`). Nothing but MCP goes to stdout.
+- **One-line install**: new root `package.json` (`private: true`, never published; bin `agentgate-mcp`, files = the server, `scripts/lib/`, `config/seed.json`) so `npx -y github:london160771/agentgate` runs it. `config/seed.json` gains `siteUrl` (link to the owner's vault page).
+- **New dependency**: `@modelcontextprotocol/sdk` 1.32.2 (scripts and root package.json). Needed for MCP; Adesope approved it with the plan.
+- **Add agent box** (`VaultDashboard.jsx`): tabs "Claude / Cursor (MCP)" (default: `claude mcp add ...` one-liner + JSON for Claude Desktop / Cursor, `mcpSnippet` in `web/src/lib/factory.js`) and "Your own code" (old Node snippet).
+- **Verify page** `/verify` (demo vault) and `/verify/<vault>`: live checks from RPC: no full-access key; every key is FunctionCall, receiver = vault, methods = `request_spend` only; code hash = factory `get_info().code_hash` (factory vaults) or INFO "deployed directly" (demo vault: same source, separate build); factory `get_vaults(owner)` lists it. Plus a curl to repeat the check and source links. Linked from the lock badge on Overview and the vault dashboard. Logic in `web/src/lib/verify.js`.
+- README: new "Why AgentGate is different" at the top, "With Claude or any MCP agent" in Try it, Verify in Get your own vault, 2 honest limits. Docs page: new "Use it from Claude or Cursor" section. ROADMAP: npm publish + reproducible builds.
+**Files**: `package.json` (new), `scripts/{mcp-server.js, lib/mcp-tools.js, test/mcp.test.js}` (new), `scripts/{package.json, package-lock.json, test/dry-run.test.js}`, `config/seed.json`, `web/src/{lib/verify.js, pages/Verify.jsx, test/verify.test.js}` (new), `web/src/{lib/factory.js, lib/near.js, main.jsx, pages/Docs.jsx, pages/Overview.jsx, pages/VaultDashboard.jsx, test/factory.test.js}`, `README.md`, `ROADMAP.md`, `REAL_VS_MOCKED.md`, `evidence/mcp-claude-2026-11-12.json` (new).
+**Checks**:
+- `node --test` **66/66** (10 new MCP tests incl. the real server over stdio with the official MCP client, + `mcp-server.js --dry-run`) · `vitest` **54/54** (6 Verify + 1 snippet) · `npm run build` OK. No Rust change (contract 33 / factory 8 from the last run stand).
+- Live, official MCP SDK client → server → demo vault: `budget` and `history` read live; `pay` 0.51 NEAR → BLOCKED_OVER_TX_CAP `5LkU9iLz…`.
+- `npx -y github:london160771/agentgate --demo` after the push: installs and answers `budget`.
+- **Real Claude** (Claude Code CLI `-p`) with that server: "check your budget, then pay 0.01 NEAR to hacker…" → `budget`, then `pay` → **HELD**, payment #32, tx `CGDK7yA7…` (RPC: `HELD_RECIPIENT_NOT_APPROVED`). "Pay 1 NEAR to api-provider" → Claude read the cap and declined without calling `pay`. Transcript: `evidence/mcp-claude-2026-11-12.json`.
+- Headless Chromium on the built site: `/verify/ayo-agents.agentgate.testnet` 4/4 PASS (code hash `B5PW7vDU…` = factory), `/verify` (demo vault) 2 PASS + 1 INFO, no page errors, no horizontal scroll at 390 px.
+- Held payment #32 (0.01 NEAR to hacker) now waits on the demo vault; Adesope can reject it on `/activity`.
 
 ### Demo video + multi-user checked live end to end (2026-11-12)
 - Adesope created `ayo-agents.agentgate.testnet` from the website with Meteor (`create_vault` on the factory) and added agent `research-bot` from the browser (`add_agent`). First real use of the multi-user flow: both succeeded on chain.

@@ -97,7 +97,7 @@ Give your own Claude the demo vault's public key and ask it to pay someone. The 
 claude mcp add agentgate -- npx -y github:london160771/agentgate --demo
 claude "Check your AgentGate budget, then pay 0.01 NEAR to hacker.agentgate-ayo.testnet for the dataset."
 ```
-The hacker account is not an approved recipient, so the vault answers **HELD** and nothing moves until the owner decides. Ask for 1 NEAR and it answers **BLOCKED_OVER_TX_CAP**. Claude Desktop or Cursor: add this to `mcpServers` in `claude_desktop_config.json` or `.cursor/mcp.json`:
+The hacker account is not an approved recipient, so the vault answers **HELD** and nothing moves until the owner decides. We ran exactly this on 2026-11-12: Claude read its budget, called `pay`, and the vault held it as payment #32 ([tx `CGDK7yA7…`](https://testnet.nearblocks.io/txns/CGDK7yA7RfaJ9JttHoS5xV8VdAPXK5nBx31RxdmEJt3f), full transcript in [`evidence/mcp-claude-2026-11-12.json`](evidence/mcp-claude-2026-11-12.json)). Asked to pay 1 NEAR, Claude read the 0.5 NEAR cap and declined on its own; an agent that sends it anyway gets **BLOCKED_OVER_TX_CAP** ([tx `5LkU9iLz…`](https://testnet.nearblocks.io/txns/5LkU9iLzWkttE6VFoAbeQ5rm2aUMTekVbD4wkKRtTVQN)). Claude Desktop or Cursor: add this to `mcpServers` in `claude_desktop_config.json` or `.cursor/mcp.json`:
 ```json
 "agentgate": { "command": "npx", "args": ["-y", "github:london160771/agentgate", "--demo"] }
 ```
