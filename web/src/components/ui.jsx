@@ -62,13 +62,13 @@ export function Ext({ href, children, className = '' }) {
 }
 
 /** The product mark: a gate (two posts and a bar) in one solid color. */
+/** The AgentGate logo: a gate with a keyhole (same drawing as public/favicon.svg). */
 export function Mark({ size = 20 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 20 20" aria-hidden="true">
-      <rect x="1" y="1" width="18" height="18" rx="5" fill="var(--ag-accent)" />
-      <rect x="5.5" y="5" width="2" height="10" rx="1" fill="#fff" />
-      <rect x="12.5" y="5" width="2" height="10" rx="1" fill="#fff" />
-      <rect x="5.5" y="9" width="9" height="2" rx="1" fill="#fff" />
+    <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true">
+      <rect width="64" height="64" rx="15" fill="var(--ag-accent)" />
+      <path d="M16 49V31a16 16 0 0 1 32 0v18" fill="none" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
+      <path d="M32 26.5a4.6 4.6 0 0 0-2.4 8.5l-1.4 8h7.6l-1.4-8a4.6 4.6 0 0 0-2.4-8.5z" fill="#fff" />
     </svg>
   );
 }

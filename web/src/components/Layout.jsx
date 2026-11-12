@@ -19,7 +19,7 @@ export default function Layout() {
       <nav className="ag-nav">
         <div className="container">
           <NavLink className="ag-brand" to="/">
-            <Mark />
+            <Mark size={24} />
             AgentGate
           </NavLink>
           <ul className="ag-links">

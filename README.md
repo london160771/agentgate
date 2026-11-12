@@ -1,3 +1,5 @@
+<img src="web/public/favicon.svg" width="64" height="64" alt="AgentGate logo: a gate with a keyhole">
+
 # AgentGate
 
 **The AI can be fooled. The money can't.**
